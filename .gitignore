@@ -4,3 +4,6 @@ dist
 *.local
 eval/audio/*.aiff
 src/vendor/
+video/node_modules
+video/out
+video/.env

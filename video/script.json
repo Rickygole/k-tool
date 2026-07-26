@@ -1,0 +1,21 @@
+{
+  "voice": "JBFqnCBsd6RMkjVDRZzb",
+  "lines": [
+    {"id":"01","text":"Every morning, in a classroom you have never been to, a seven year old opens a book."},
+    {"id":"02","text":"A few times a year, her teacher sits beside her and listens. And makes a small mark on paper every time a word goes wrong."},
+    {"id":"03","text":"It takes a minute to read. It takes four more to score. And there are twenty seven other children waiting."},
+    {"id":"04","text":"So we built something that does the counting. It runs on the laptop already sitting on her desk."},
+    {"id":"05","text":"And the first thing it does is disconnect."},
+    {"id":"06","text":"She reads. The words arrive on the screen, and every one is measured against the page she was handed."},
+    {"id":"07","text":"Green, she read it. Red, she did not. And amber, where the machine is not sure enough to call it a mistake. So it doesn't."},
+    {"id":"08","text":"Her teacher can overrule any of it, in either direction. She is the one doing the assessing. We only hold the stopwatch."},
+    {"id":"09","text":"We built one more thing. A layer that refuses to mark a child down for the way their family speaks."},
+    {"id":"10","text":"Then we measured whether it ever worked."},
+    {"id":"11","text":"Not once."},
+    {"id":"12","text":"The speech model had already rewritten her voice into standard spelling, long before our rules could see it. So we published the zero, and the reason for it."},
+    {"id":"13","text":"What we found underneath was bigger. On the speech it was meant to protect, the recogniser pulls words apart and fuses them together. No rule about pronunciation can reach that."},
+    {"id":"14","text":"On a clean read, we tell a child they made a mistake four times in every thousand words. That is the number we care about most."},
+    {"id":"15","text":"Because telling a child who read it perfectly that she got it wrong is the worse thing to be."},
+    {"id":"16","text":"No subscription. No account. No child's voice ever leaving the room."}
+  ]
+}
