@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ReadAloud</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#141c22; --paper:#f4f6f4; --muted:#5d6b73; --line:rgba(20,28,34,.12);
+  --accent:#2f6f68; --gold:#d99a2b; --green:#2f7d4f; --red:#b3261e; --amber:#8a5a00;
+}
+html,body{height:100%;background:#0d1418;font-family:"IBM Plex Sans",-apple-system,"Segoe UI",system-ui,sans-serif;color:var(--ink);overflow:hidden}
+.deck{position:relative;width:100vw;height:100vh}
+.slide{
+  position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
+  padding:6vh 9vw;background:var(--paper);opacity:0;visibility:hidden;
+  transition:opacity .5s cubic-bezier(.4,0,.2,1),transform .5s cubic-bezier(.4,0,.2,1);
+  transform:translateY(14px) scale(.995);
+}
+.slide.active{opacity:1;visibility:visible;transform:none}
+.slide.dark{background:#101a1f;color:#eef2f0}
+.slide.dark .muted{color:#93a5ad}
+.slide.dark .rule{background:rgba(255,255,255,.14)}
+
+h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(40px,7.2vw,104px);line-height:.98;letter-spacing:-.025em;font-weight:600}
+h2{font-family:Georgia,serif;font-size:clamp(30px,4.4vw,62px);line-height:1.06;letter-spacing:-.02em;font-weight:600}
+h3{font-family:Georgia,serif;font-size:clamp(20px,2.1vw,30px);font-weight:600;line-height:1.2}
+p{font-size:clamp(15px,1.55vw,23px);line-height:1.5;max-width:34em}
+.lede{font-size:clamp(18px,2vw,30px);line-height:1.42;max-width:26em}
+.muted{color:var(--muted)}
+.kicker{font-size:clamp(10px,.86vw,13px);text-transform:uppercase;letter-spacing:.22em;font-weight:600;color:var(--accent);margin-bottom:2.4vh}
+.dark .kicker{color:var(--gold)}
+.rule{height:2px;background:var(--ink);width:74px;margin:2.6vh 0}
+.big-num{font-family:Georgia,serif;font-size:clamp(56px,11vw,168px);line-height:.88;letter-spacing:-.035em;font-weight:600}
+
+/* staged reveal */
+[data-step]{opacity:0;transform:translateY(10px);transition:opacity .45s ease,transform .45s cubic-bezier(.2,.8,.3,1)}
+.slide.active [data-step].shown{opacity:1;transform:none}
+
+.grid{display:grid;gap:2.2vw}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:repeat(3,1fr)}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:2.1vh 1.5vw}
+.dark .card{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)}
+.stat .n{font-family:Georgia,serif;font-size:clamp(26px,3.6vw,54px);font-weight:600;display:block;line-height:1}
+.stat .l{font-size:clamp(10px,.86vw,13px);text-transform:uppercase;letter-spacing:.11em;color:var(--muted);margin-top:.7vh}
+
+table{width:100%;border-collapse:collapse;font-size:clamp(12px,1.25vw,19px)}
+th,td{text-align:left;padding:1.15vh .7vw;border-bottom:1px solid var(--line)}
+.dark th,.dark td{border-color:rgba(255,255,255,.12)}
+th{font-size:clamp(9px,.78vw,12px);text-transform:uppercase;letter-spacing:.13em;color:var(--muted);font-weight:600}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+
+.w{padding:.06em .26em;border-radius:4px;font-family:Georgia,serif}
+.w.ok{color:inherit}
+.w.om{color:var(--red);background:#fbe9e8;text-decoration:line-through 2px}
+.w.sub{color:var(--red);background:#fbe9e8;text-decoration:underline solid 2px}
+.w.sc{color:var(--green);background:#e6f2ea;text-decoration:underline dotted 2px}
+.w.a{color:var(--amber);background:#fdf1dc;text-decoration:underline wavy 1px}
+sup{font-size:.52em;font-weight:700;letter-spacing:.03em}
+
+.zero{font-family:Georgia,serif;font-size:clamp(90px,20vw,300px);line-height:.8;font-weight:600;color:var(--gold);letter-spacing:-.04em}
+.pill{display:inline-block;font-size:clamp(11px,1vw,15px);padding:.4em .9em;border-radius:999px;background:rgba(47,111,104,.1);color:var(--accent);font-weight:600}
+.dark .pill{background:rgba(217,154,43,.16);color:var(--gold)}
+
+.flow{display:flex;align-items:center;gap:1vw;flex-wrap:wrap;font-size:clamp(11px,1.1vw,17px)}
+.flow b{background:#fff;border:1px solid var(--line);border-radius:9px;padding:1.1vh .9vw;font-weight:500}
+.dark .flow b{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14)}
+.flow i{color:var(--muted);font-style:normal}
+
+.progress{position:fixed;left:0;bottom:0;height:3px;background:var(--gold);transition:width .4s ease;z-index:50}
+.hint{position:fixed;right:2vw;bottom:2.2vh;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(120,140,150,.55);z-index:50}
+.num{position:fixed;left:2vw;bottom:2vh;font-size:11px;color:rgba(120,140,150,.55);z-index:50;font-variant-numeric:tabular-nums}
+@media(prefers-reduced-motion:reduce){.slide,[data-step]{transition:none!important}}
+
+/* Print: one slide per landscape page, every reveal visible, no chrome. */
+@page{size:1600px 900px;margin:0}
+@media print{
+  html,body{overflow:visible;height:auto;background:#fff}
+  .deck{height:auto}
+  .slide{position:relative;inset:auto;width:1600px;height:900px;opacity:1!important;visibility:visible!important;
+    transform:none!important;page-break-after:always;break-after:page;display:flex}
+  [data-step]{opacity:1!important;transform:none!important}
+  .progress,.hint,.num{display:none!important}
+}
+
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<section class="slide dark">
+  <div class="kicker" data-step="1">CEAMLS · Human-AI Collaboration Challenge</div>
+  <h1 data-step="2">ReadAloud</h1>
+  <div class="rule" data-step="3"></div>
+  <p class="lede muted" data-step="4">A child reads for one minute.<br>The laptop scores it. Nothing leaves the room.</p>
+</section>
+
+<section class="slide">
+  <div class="kicker" data-step="1">The minute that costs the most</div>
+  <h2 data-step="2">A teacher sits with one child<br>while twenty seven others wait.</h2>
+  <p class="muted" style="margin-top:3vh" data-step="3">A running record is the most informative minute in elementary literacy assessment. Sixty seconds of reading, then four minutes of hand tallying every error. Three times a year, for every child.</p>
+  <p style="margin-top:2.4vh" data-step="4"><strong>The tallying is the part a machine should do.</strong> The judgement is not.</p>
+</section>
+
+<section class="slide">
+  <div class="kicker" data-step="1">What it does</div>
+  <h2 data-step="2">We already know what the passage says.</h2>
+  <p class="muted" style="margin-top:2.4vh;max-width:30em" data-step="3">So this is not open transcription. It is alignment against a known text, which collapses the search space from forty thousand candidate words to about a hundred.</p>
+  <div class="flow" style="margin-top:4vh" data-step="4">
+    <b>Microphone</b><i>&rsaquo;</i><b>Whisper, on device</b><i>&rsaquo;</i><b>Needleman&ndash;Wunsch alignment</b><i>&rsaquo;</i><b>Miscue classification</b><i>&rsaquo;</i><b>Running record</b>
+  </div>
+  <p style="margin-top:4vh" data-step="5"><span class="pill">No server · No API key · No language model</span></p>
+</section>
+
+<section class="slide dark" style="justify-content:center;align-items:flex-start">
+  <div class="kicker" data-step="1">Now</div>
+  <h1 data-step="2" style="max-width:14em">Turn the wifi off<br>and read to it.</h1>
+  <p class="lede muted" style="margin-top:3vh" data-step="3">Verified in a real browser with every external host blocked. Record, transcribe, score, print. Zero outbound requests.</p>
+</section>
+
+<section class="slide">
+  <div class="kicker" data-step="1">What the teacher sees</div>
+  <h3 data-step="2" style="margin-bottom:2.4vh">Every deviation is named, and so is every forgiveness.</h3>
+  <p style="font-size:clamp(19px,2.5vw,38px);line-height:1.85;font-family:Georgia,serif" data-step="3">
+    Nora <span class="w om">lost<sup>O</sup></span> her <span class="w a">red<sup>?</sup></span> mitten on the way to <span class="w sc">school<sup>SC</sup></span>, but the <span class="w sub">bell<sup>S</sup></span> rang for recess.
+  </p>
+  <div class="grid g3" style="margin-top:4vh" data-step="4">
+    <div class="card"><strong style="color:var(--green)">Green, dotted</strong><p class="muted" style="font-size:clamp(12px,1.1vw,17px);margin-top:.6vh">Self correction. Not an error. Evidence the reader is monitoring themselves.</p></div>
+    <div class="card"><strong style="color:var(--red)">Red</strong><p class="muted" style="font-size:clamp(12px,1.1vw,17px);margin-top:.6vh">Counted as an error. Struck through if the word was skipped, underlined if it was misread.</p></div>
+    <div class="card" style="border-color:var(--gold)"><strong style="color:var(--amber)">Amber</strong><p class="muted" style="font-size:clamp(12px,1.1vw,17px);margin-top:.6vh">We are not confident enough to call it an error, so we do not.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="kicker" data-step="1">The control that matters</div>
+  <h2 data-step="2">The override runs<br>in both directions.</h2>
+  <p class="muted" style="margin-top:2.6vh" data-step="3">Four filters sit in this engine and every one of them can only <em>remove</em> errors. If the only control a teacher had were the power to forgive, every adjustment the tool offered would push the score upward.</p>
+  <p style="margin-top:2.4vh" data-step="4">So a teacher can mark a flagged word correct, <strong>and mark a forgiven word as an error.</strong></p>
+  <p class="lede" style="margin-top:3.4vh;font-family:Georgia,serif" data-step="5">The teacher is the assessor. We are the stopwatch.</p>
+</section>
+
+<section class="slide dark">
+  <div class="kicker" data-step="1">Our headline feature</div>
+  <h2 data-step="2" style="max-width:17em">A dialect layer, so a child who speaks African American English is not scored down for pronunciation.</h2>
+  <p class="lede muted" style="margin-top:3vh" data-step="3">Miscue analysis has done exactly that for decades. Speech recognisers make it worse: roughly double the word error rate for Black speakers across all five major commercial systems.</p>
+  <p class="muted" style="margin-top:2.2vh;font-size:clamp(12px,1.1vw,16px)" data-step="4">Labov &amp; Baker 2010 · Charity et al. 2004 · Koenecke et al., PNAS 2020</p>
+</section>
+
+<section class="slide dark" style="align-items:center;text-align:center;justify-content:center">
+  <div class="kicker" data-step="1">We measured whether it fires</div>
+  <div class="zero" data-step="2">0</div>
+  <h3 data-step="3" style="margin-top:2vh">times, across five passages and four hundred and twenty one words.</h3>
+  <p class="lede muted" style="margin-top:2.6vh;max-width:24em" data-step="4">We published the zero.</p>
+</section>
+
+<section class="slide">
+  <div class="kicker" data-step="1">Why</div>
+  <h3 data-step="2">Whisper rewrites the dialect before our rules ever see it.</h3>
+  <table style="margin-top:3vh" data-step="3">
+    <thead><tr><th>Spoken</th><th>Whisper wrote</th><th></th></tr></thead>
+    <tbody>
+      <tr><td style="font-family:Georgia,serif">aksed</td><td style="font-family:Georgia,serif">asked</td><td class="muted">normalised away</td></tr>
+      <tr><td style="font-family:Georgia,serif">wif</td><td style="font-family:Georgia,serif">with</td><td class="muted">normalised away</td></tr>
+      <tr><td style="font-family:Georgia,serif">sista</td><td style="font-family:Georgia,serif">sister</td><td class="muted">normalised away</td></tr>
+      <tr><td style="font-family:Georgia,serif">dis col</td><td style="font-family:Georgia,serif;color:var(--red)"><strong>Diskal</strong></td><td class="muted">word boundary destroyed</td></tr>
+      <tr><td style="font-family:Georgia,serif">fo fo</td><td style="font-family:Georgia,serif;color:var(--red)"><strong>Fofo</strong></td><td class="muted">word boundary destroyed</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:3vh" data-step="4"><strong>A layer that compares words cannot repair a broken word boundary.</strong> The dialect speaking reader is charged five errors on a twelve word passage, and our feature is blind to all of it.</p>
+</section>
+
+<section class="slide">
+  <div class="kicker" data-step="1">So the honest claim is smaller, and it survives</div>
+  <h2 data-step="2" style="max-width:15em">The equity contribution is the architecture, not the rule table.</h2>
+  <p style="margin-top:3vh" data-step="3">Aligning against a known hundred word passage collapses the recognition search space from roughly forty thousand candidates to a hundred. That absorbs most accent driven recognition error <em>structurally</em>, rather than by rule.</p>
+  <p style="margin-top:2.2vh" data-step="4">And no child&rsquo;s voice ever leaves the laptop.</p>
+</section>
+
+<section class="slide">
+  <div class="kicker" data-step="1">We tested it</div>
+  <div class="grid g3" data-step="2">
+    <div class="card stat"><span class="n" style="color:var(--green)">0.48%</span><span class="l">False positives, clean reads</span></div>
+    <div class="card stat"><span class="n" style="color:var(--green)">0.4</span><span class="l">Mean WCPM error</span></div>
+    <div class="card stat"><span class="n">77</span><span class="l">Automated tests, all green</span></div>
+  </div>
+  <table style="margin-top:3.4vh" data-step="3">
+    <thead><tr><th>Miscue type</th><th class="n">Precision</th><th class="n">Recall</th><th class="n">F1</th></tr></thead>
+    <tbody>
+      <tr><td>Substitution</td><td class="n">81.8%</td><td class="n">90.0%</td><td class="n">85.7%</td></tr>
+      <tr><td>Omission</td><td class="n">93.8%</td><td class="n">100.0%</td><td class="n">96.8%</td></tr>
+      <tr><td>Insertion</td><td class="n">83.3%</td><td class="n">100.0%</td><td class="n">90.9%</td></tr>
+      <tr><td>Self correction</td><td class="n">100.0%</td><td class="n">40.0%</td><td class="n">57.1%</td></tr>
+    </tbody>
+  </table>
+  <p class="muted" style="margin-top:2.4vh;font-size:clamp(12px,1.15vw,18px)" data-step="4">Ground truth is <strong>constructed, not annotated</strong>. We generate the spoken text from the reference by applying an explicit error script, so there is no labelling step to disagree with and no way to score our own homework.</p>
+</section>
+
+<section class="slide">
+  <div class="kicker" data-step="1">Why false positives is the number we optimised</div>
+  <h2 data-step="2" style="max-width:16em">Telling a child who read correctly that they made a mistake is the worse failure.</h2>
+  <p class="muted" style="margin-top:3vh" data-step="3">Those two errors do not trade off evenly in a classroom. One costs a teacher thirty seconds of checking. The other costs a seven year old some part of their belief that they can read.</p>
+</section>
+
+<section class="slide">
+  <div class="kicker" data-step="1">What it cannot do</div>
+  <h3 data-step="2">We have never run this on a child&rsquo;s voice.</h3>
+  <p class="muted" style="margin-top:2.4vh" data-step="3">Every evaluation clip is speech synthesis, one adult voice reading faster than the ninetieth percentile for grade six. A seven year old at sixty words a minute with real pauses will behave differently, and that is the largest unknown in the system.</p>
+  <p class="muted" style="margin-top:2vh" data-step="4">Self correction recall is forty percent by construction. Published norms stop at grade six. It is a screening aid and a research prototype, not a validated instrument.</p>
+  <p style="margin-top:3vh" data-step="5"><strong>The path to one is an inter rater reliability study against certified human scorers, stratified by dialect.</strong> That is a semester, not a weekend.</p>
+</section>
+
+<section class="slide dark" style="justify-content:center">
+  <div class="kicker" data-step="1">ReadAloud</div>
+  <h1 data-step="2" style="max-width:13em">No subscription.<br>No API key.<br>No child&rsquo;s voice leaving the building.</h1>
+  <p class="lede muted" style="margin-top:3.4vh" data-step="3">It runs on hardware schools already own.</p>
+  <p style="margin-top:3vh" data-step="4"><span class="pill">Here is the printed running record.</span></p>
+</section>
+
+</div>
+<div class="progress" id="bar"></div>
+<div class="num" id="num"></div>
+<div class="hint">&larr; &rarr; or space</div>
+
+<script>
+
+// Slide + step navigation. Right/space advances one reveal at a time, then moves to the next
+// slide. Left goes back a whole slide, which is what you want when you overshoot on stage.
+const slides = [...document.querySelectorAll('.slide')];
+const bar = document.getElementById('bar');
+const num = document.getElementById('num');
+let si = 0, step = 0;
+
+function stepsOn(i) {
+  return [...slides[i].querySelectorAll('[data-step]')]
+    .sort((a, b) => (+a.dataset.step) - (+b.dataset.step));
+}
+
+function render() {
+  slides.forEach((s, i) => s.classList.toggle('active', i === si));
+  const els = stepsOn(si);
+  els.forEach((el, i) => el.classList.toggle('shown', i < step));
+  bar.style.width = ((si + (els.length ? step / els.length : 1)) / slides.length * 100) + '%';
+  num.textContent = (si + 1) + ' / ' + slides.length;
+  location.hash = si + 1;
+}
+
+function next() {
+  const n = stepsOn(si).length;
+  if (step < n) { step++; }
+  else if (si < slides.length - 1) { si++; step = stepsOn(si).length ? 1 : 0; }
+  render();
+}
+function prev() {
+  if (si > 0) { si--; step = stepsOn(si).length; render(); }
+}
+function goto(i) { si = Math.max(0, Math.min(slides.length - 1, i)); step = stepsOn(si).length; render(); }
+
+addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); next(); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
+  else if (e.key === 'Home') goto(0);
+  else if (e.key === 'End') goto(slides.length - 1);
+  // 'a' reveals everything on the current slide, for when you need to skip ahead mid-talk.
+  else if (e.key === 'a') { step = stepsOn(si).length; render(); }
+});
+addEventListener('click', (e) => { if (!e.target.closest('a')) next(); });
+
+const start = parseInt(location.hash.slice(1), 10);
+if (start > 0) goto(start - 1); else { step = 1; render(); }
+
+</script>
+</body>
+</html>
