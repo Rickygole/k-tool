@@ -46,11 +46,11 @@
           "found": 1
         }
       },
-      "cleanFalsePositives": 1,
-      "cleanAccuracy": 98.8,
-      "wcpmReported": 218,
-      "wcpmTrue": 220,
-      "transcriptClean": "Little Fox lived at the edge of the woods. Every morning she went down to the stream to drink. One day she found a shiny stone in the water, it was smooth and cold and it sparkled in the sun. She carried it home in her mouth and put it under a tall pine tree. All winter long she kept it safe. When spring came she showed the stone to her brother and he said it was the finest one he had ever seen."
+      "cleanFalsePositives": 0,
+      "cleanAccuracy": 100,
+      "wcpmReported": 216,
+      "wcpmTrue": 216,
+      "transcriptClean": "The little fox lived at the edge of the woods. Every morning she went down to the stream to drink. One day she found a shiny stone in the water, it was smooth and cold and it sparkled in the sun. She carried it home in her mouth and put it under a tall pine tree, all winter long she kept it safe. When spring came she showed the stone to her brother and he said it was the finest one he had ever seen."
     },
     {
       "id": "bridge",
@@ -79,13 +79,13 @@
         },
         "insertion": {
           "tp": 2,
-          "fp": 1,
+          "fp": 0,
           "fn": 0,
-          "precision": 0.6666666666666666,
+          "precision": 1,
           "recall": 1,
-          "f1": 0.8,
+          "f1": 1,
           "expected": 2,
-          "found": 3
+          "found": 2
         },
         "self_correction": {
           "tp": 0,
@@ -98,11 +98,11 @@
           "found": 0
         }
       },
-      "cleanFalsePositives": 0,
-      "cleanAccuracy": 100,
-      "wcpmReported": 202,
-      "wcpmTrue": 202,
-      "transcriptClean": "The old wooden bridge crossed the river just below the mill. For many years the farmers used it to bring their carts to market. One autumn the rain fell for nine days without stopping and the river rose higher than anyone could remember. The bridge groaned but it held, when the water finally went down the whole town gathered on the bank to see whether it had survived, it had, and the mayor declared that the bridge would stand for another hundred years."
+      "cleanFalsePositives": 2,
+      "cleanAccuracy": 97.6,
+      "wcpmReported": 193,
+      "wcpmTrue": 198,
+      "transcriptClean": "The old wood and bridge crossed the river just below the mill, for many years the farmers used it to bring their carts to market. One autumn the rain fell for nine days without stopping and the river rose higher than anyone could remember, the bridge groaned but it held, when the water finally went down the whole town gathered on the bank to see whether it had survived, it had, and the mayor declared that the bridge would stand for another hundred years."
     },
     {
       "id": "garden",
@@ -152,9 +152,9 @@
       },
       "cleanFalsePositives": 0,
       "cleanAccuracy": 100,
-      "wcpmReported": 197,
-      "wcpmTrue": 197,
-      "transcriptClean": "Nobody expected a garden to grow on the roof of the library. It started when a librarian carried up four buckets of soil and a packet of bean seeds. She watered them every morning before the doors opened. By July the vines had climbed the railing and the beans hung down in long green robes. Children came up the narrow stairs to look at them. The librarian said that anything will grow if somebody remembers to come back and take care of it."
+      "wcpmReported": 193,
+      "wcpmTrue": 193,
+      "transcriptClean": "Nobody expected a garden to grow on the roof of the library, it started when a librarian carried up four buckets of soil and a packet of bean seeds, she watered them every morning before the doors opened, by July the vines had climbed the railing and the beans hung down in long green robes, children came up the narrow stairs to look at them, the librarian said that anything will grow if somebody remembers to come back and take care of it."
     },
     {
       "id": "whale",
@@ -163,13 +163,13 @@
       "stats": {
         "substitution": {
           "tp": 4,
-          "fp": 4,
+          "fp": 1,
           "fn": 0,
-          "precision": 0.5,
+          "precision": 0.8,
           "recall": 1,
-          "f1": 0.6666666666666666,
+          "f1": 0.888888888888889,
           "expected": 4,
-          "found": 8
+          "found": 5
         },
         "omission": {
           "tp": 3,
@@ -204,9 +204,9 @@
       },
       "cleanFalsePositives": 0,
       "cleanAccuracy": 100,
-      "wcpmReported": 181,
-      "wcpmTrue": 181,
-      "transcriptClean": "The boat left the harbor before sunrise, carrying 11 passengers and a guide who had counted whales in these waters for 20 years. She told them that patience mattered more than luck. For two hours they saw nothing but grey water and gulls. Then, without warning, a humpback rose beside the boat and rolled onto its side, lifting one long fin into the air as though it were waving. Nobody spoke, the guide said afterwards that she had never grown used to that moment."
+      "wcpmReported": 178,
+      "wcpmTrue": 178,
+      "transcriptClean": "The boat left the harbor before sunrise, carrying 11 passengers and a guide who had counted whales in these waters for 20 years. She told them that patience mattered more than luck, for two hours they saw nothing but grey water and gulls. Then, without warning, a humpback rose beside the boat and rolled onto its side, lifting one long fin into the air as though it were waving, nobody spoke. The guide said afterwards that she had never grown used to that moment."
     },
     {
       "id": "letter",
@@ -256,19 +256,19 @@
       },
       "cleanFalsePositives": 0,
       "cleanAccuracy": 100,
-      "wcpmReported": 208,
-      "wcpmTrue": 208,
-      "transcriptClean": "In the back of the drawer, underneath a stack of receipts, my grandmother kept a letter she had never opened. It arrived the summer she turned 19 and she put it away because she was afraid of what it might say. 60 years later she handed it to me and asked me to read it aloud. It was an invitation to a wedding that had happened long ago. She laughed until she had to sit down, and then she asked me to read it once more."
+      "wcpmReported": 204,
+      "wcpmTrue": 204,
+      "transcriptClean": "In the back of the drawer, underneath a stack of receipts, my grandmother kept a letter she had never opened; it arrived the summer she turned 19 and she put it away because she was afraid of what it might say. Sixty years later she handed it to me and asked me to read it aloud; it was an invitation to a wedding that had happened long ago; she laughed until she had to sit down, and then she asked me to read it once more."
     }
   ],
   "agg": {
     "substitution": {
       "tp": 16,
-      "fp": 7,
+      "fp": 4,
       "fn": 4,
-      "precision": 0.6956521739130435,
+      "precision": 0.8,
       "recall": 0.8,
-      "f1": 0.7441860465116279
+      "f1": 0.8000000000000002
     },
     "omission": {
       "tp": 15,
@@ -280,11 +280,11 @@
     },
     "insertion": {
       "tp": 10,
-      "fp": 3,
+      "fp": 2,
       "fn": 0,
-      "precision": 0.7692307692307693,
+      "precision": 0.8333333333333334,
       "recall": 1,
-      "f1": 0.8695652173913044
+      "f1": 0.9090909090909091
     },
     "self_correction": {
       "tp": 2,
@@ -301,6 +301,6 @@
     "homophone": 1
   },
   "dialectRuleTotals": {},
-  "fpRate": 0.23752969121140144,
-  "meanWcpmError": 0.4
+  "fpRate": 0.4750593824228029,
+  "meanWcpmError": 1
 }

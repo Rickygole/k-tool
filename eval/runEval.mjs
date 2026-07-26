@@ -30,12 +30,34 @@ const SKIP_AUDIO = process.argv.includes('--skip-audio')
 
 mkdirSync(AUDIO_DIR, { recursive: true })
 
-/** Render text to a 16kHz mono WAV via macOS `say`. Deterministic, so reruns are comparable. */
+/**
+ * Render text to a 16kHz mono WAV via macOS `say`. Deterministic, so reruns are comparable.
+ *
+ * The 500ms of leading silence is not cosmetic. Whisper truncates speech onset when audio
+ * begins at t=0 -- on the unpadded demo clip it swallowed the word "The" and the scorer
+ * correctly reported an omission that the reader never made. That is an audio capture
+ * artifact, not a reading event, and padding is the honest fix. The live recorder gets the
+ * same treatment for the same reason.
+ */
+const LEAD_SILENCE_SEC = 0.5
+
 function renderAudio(text, outPath) {
   if (SKIP_AUDIO && existsSync(outPath)) return
   const aiff = `${outPath}.aiff`
+  const speechPath = `${outPath}.speech.wav`
   execFileSync('say', ['-v', 'Samantha', '-r', '130', '-o', aiff, text])
-  execFileSync('afconvert', ['-f', 'WAVE', '-d', 'LEI16@16000', '-c', '1', aiff, outPath])
+  execFileSync('afconvert', ['-f', 'WAVE', '-d', 'LEI16@16000', '-c', '1', aiff, speechPath])
+
+  const speech = readFileSync(speechPath)
+  const dataIdx = speech.indexOf(Buffer.from('data', 'ascii'), 12)
+  const header = speech.subarray(0, dataIdx + 8)
+  const pcm = speech.subarray(dataIdx + 8)
+  const pad = Buffer.alloc(Math.round(LEAD_SILENCE_SEC * 16000) * 2)
+
+  const out = Buffer.concat([header, pad, pcm])
+  out.writeUInt32LE(pad.length + pcm.length, dataIdx + 4) // data chunk size
+  out.writeUInt32LE(out.length - 8, 4) // RIFF size
+  writeFileSync(outPath, out)
 }
 
 function readWav16kMono(path) {
