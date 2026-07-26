@@ -14,7 +14,22 @@ import { useEffect, useState } from 'react'
 
 const STORAGE_KEY = 'readaloud.prefs.v1'
 
-const DEFAULTS = { font: 'default', size: 'default', contrast: 'default' }
+const DEFAULTS = { font: 'default', size: 'default', theme: 'light' }
+
+/**
+ * Three themes on one control, because they are mutually exclusive states of the same thing.
+ *
+ * Dark and high contrast are NOT the same feature and neither replaces the other. Dark mode is
+ * comfort, for a room with the lights off or a teacher on their fourth hour. High contrast is a
+ * low vision affordance: it drops the tinted word backgrounds entirely and leans on the glyphs
+ * and underline weights, which is the same reason the printed record survives a monochrome
+ * printer.
+ */
+const THEMES = [
+  { value: 'light', label: 'Light', title: 'Light theme' },
+  { value: 'dark', label: 'Dark', title: 'Dark theme, easier in a dim room' },
+  { value: 'contrast', label: 'Contrast', title: 'High contrast, for low vision' },
+]
 
 const SIZES = [
   { value: 'default', label: 'A', title: 'Standard text size', className: 'text-xs' },
@@ -26,7 +41,13 @@ function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return DEFAULTS
-    return { ...DEFAULTS, ...JSON.parse(raw) }
+    const saved = JSON.parse(raw)
+    // Migration. Contrast used to be its own boolean axis; it is now one of three themes.
+    // Somebody who had turned it on is a person who needs it, so carrying that across matters
+    // more than the tidiness of dropping the old key.
+    if (saved.contrast === 'high' && !saved.theme) saved.theme = 'contrast'
+    delete saved.contrast
+    return { ...DEFAULTS, ...saved }
   } catch {
     // Private browsing, disabled storage, corrupt JSON. Preferences are a nicety; failing to
     // read them must never stop the app from rendering.
@@ -41,7 +62,10 @@ export function AccessibilityBar() {
     const root = document.documentElement
     root.dataset.font = prefs.font
     root.dataset.size = prefs.size
-    root.dataset.contrast = prefs.contrast
+    // 'contrast' is a theme here, not a separate axis, so only one of the two attributes is
+    // ever set. Anything reading data-contrast still works for the high contrast case.
+    root.dataset.theme = prefs.theme === 'dark' ? 'dark' : ''
+    root.dataset.contrast = prefs.theme === 'contrast' ? 'high' : ''
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs))
     } catch {
@@ -82,14 +106,23 @@ export function AccessibilityBar() {
         Dyslexia font
       </ToggleButton>
 
-      <ToggleButton
-        pressed={prefs.contrast === 'high'}
-        onClick={() => set({ contrast: prefs.contrast === 'high' ? 'default' : 'high' })}
-        title="High contrast colours"
-        wide
-      >
-        High contrast
-      </ToggleButton>
+      <fieldset className="flex items-center gap-1.5">
+        <legend className="sr-only">Theme</legend>
+        <span aria-hidden="true" className="field-label mr-0.5">
+          Theme
+        </span>
+        {THEMES.map((t) => (
+          <ToggleButton
+            key={t.value}
+            pressed={prefs.theme === t.value}
+            onClick={() => set({ theme: t.value })}
+            title={t.title}
+            wide
+          >
+            {t.label}
+          </ToggleButton>
+        ))}
+      </fieldset>
     </div>
   )
 }

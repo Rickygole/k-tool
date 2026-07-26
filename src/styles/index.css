@@ -38,6 +38,69 @@
   --ra-font-ui: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
+/* Dark mode.
+   
+   Not an inversion. A few things have to be designed rather than flipped:
+   
+   The background is a warm near black (#171c20) rather than #000, and the text is #e6e2da
+   rather than #fff. Pure white on pure black produces halation, where the glyphs appear to
+   bleed at the edges, and it is worst on exactly the long serif passage this app asks a child
+   to read for a minute.
+   
+   The three semantic colours get LIGHTER here, not darker. On a light background a green has to
+   be dark enough to read against white; on a dark background the same green disappears. These
+   are the light-on-dark counterparts, all above 4.5:1 against the dark surface.
+   
+   The tinted word backgrounds become low alpha washes of their own hue instead of pale pastels,
+   because a pastel fill on a dark ground reads as a highlighter pen and drowns the text. */
+:root[data-theme='dark'] {
+  --ra-bg: #171c20;
+  --ra-surface: #1e252a;
+  --ra-fg: #e6e2da;
+  --ra-muted: #9aa7ad;
+  --ra-border: rgba(190, 214, 210, 0.16);
+  --ra-accent: #7fbdb4;
+
+  --ra-correct: #7fc99a;
+  --ra-correct-bg: rgba(127, 201, 154, 0.14);
+  --ra-miscue: #f08a80;
+  --ra-miscue-bg: rgba(240, 138, 128, 0.15);
+  --ra-unsure: #e5b45f;
+  --ra-unsure-bg: rgba(229, 180, 95, 0.15);
+}
+
+/* The header uses a translucent blur over the page colour, so it needs the dark value too. */
+:root[data-theme='dark'] .card {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* Selects and inputs keep the browser's light chrome unless told otherwise. */
+:root[data-theme='dark'] select,
+:root[data-theme='dark'] input,
+:root[data-theme='dark'] textarea {
+  color-scheme: dark;
+  background: var(--ra-surface);
+  color: var(--ra-fg);
+  border-color: var(--ra-border);
+}
+
+/* Printing is always on white paper. A dark theme must never reach the printed record. */
+@media print {
+  :root[data-theme='dark'] {
+    --ra-bg: #ffffff;
+    --ra-surface: #ffffff;
+    --ra-fg: #000000;
+    --ra-muted: #333333;
+    --ra-border: #999999;
+    --ra-correct: #14532d;
+    --ra-correct-bg: #ffffff;
+    --ra-miscue: #7a0d09;
+    --ra-miscue-bg: #ffffff;
+    --ra-unsure: #5c3c00;
+    --ra-unsure-bg: #ffffff;
+  }
+}
+
 /* Three text sizes. The passage moves further than the interface does: the child needs the
    bigger text, the teacher is reading the same UI either way. */
 :root[data-size='large'] {
