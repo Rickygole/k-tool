@@ -1,12 +1,17 @@
 /**
- * Assessment passages. All five are original text written for this project. Nothing is
+ * Assessment passages. Every one is original text written for this project. Nothing is
  * lifted from a published reading program, because those are copyrighted and because a
  * benchmark passage that has already been taught is not a benchmark.
  *
+ * There is at least one passage per grade from kindergarten through twelve. Length scales with
+ * the grade for a reason: the whole measure is words read correctly in about a minute, so a
+ * kindergarten passage of a hundred words would just be a hundred words the child never reaches.
+ * Thirty odd words at K, around a hundred and thirty by high school.
+ *
  * Constraints they are written to, which are load-bearing rather than stylistic:
  *
- *   - ~100 words. Long enough that WCPM is not dominated by one stumble, short enough that a
- *     grade-2 reader finishes inside a minute or two.
+ *   - Length matched to the grade. Long enough that WCPM is not dominated by one stumble,
+ *     short enough that the reader actually gets through most of it inside a minute.
  *   - No digits. `normalize.expandNumbers` rewrites "5" to "five" before tokenising, so a
  *     numeral in the source would render in the marked-up passage as its spelled-out form and
  *     no longer match the printed page. Spell numbers out here instead.
@@ -101,6 +106,156 @@ export const PASSAGES = [
       'sideways under a curtain of seaweed. Everything living there survives being covered ' +
       'and uncovered twice every single day. That is a harder life than it looks from the ' +
       'path above.',
+  },
+  {
+    id: 'k',
+    title: 'My Cat Naps',
+    grade: 0,
+    blurb: 'Sight words and short sentences. About thirty words.',
+    text:
+      'The cat sat on my bed. She is soft and warm. I pet her back. She likes that a lot. Then ' +
+      'she went to nap in the sun by the big red chair.',
+  },
+  {
+    id: 'g1',
+    title: 'Sam and Pip',
+    grade: 1,
+    blurb: 'Simple sentences, common words. Around fifty five words.',
+    text:
+      'Sam has a little dog named Pip. Every day after school they run to the park. Pip likes to ' +
+      'chase the ball, but he will not bring it back. Sam has to run after him. When they get ' +
+      'home, Sam gives Pip water and a snack. Then they both sit down on the step and rest.',
+  },
+  {
+    id: 'g5',
+    title: "The Keeper's Journal",
+    grade: 5,
+    blurb: 'Longer clauses and multisyllable vocabulary. Around one hundred and fifteen words.',
+    text:
+      'The lighthouse keeper kept a journal for thirty years, and every entry began with the ' +
+      'weather. Most days were ordinary. Fog rolled in from the north, or the wind picked up by ' +
+      'afternoon, or nothing happened at all worth recording. But on one page in the middle of ' +
+      'the third volume, the handwriting changes. It becomes hurried and much larger. A ship had ' +
+      'come too close to the rocks during a storm, and the keeper had rowed out twice in the ' +
+      'dark to bring the crew ashore. He wrote four pages that night. The next morning he ' +
+      'returned to his usual habit, noting the temperature and the tide, as though nothing ' +
+      'unusual had happened.',
+  },
+  {
+    id: 'g6',
+    title: 'The Ice Trade',
+    grade: 6,
+    blurb: 'Expository text with technical vocabulary. Around one hundred and thirty words.',
+    text:
+      'Before refrigeration, entire towns depended on ice cut from frozen lakes in winter. Crews ' +
+      'worked through January with saws and horses, carving the surface into enormous blocks and ' +
+      'hauling them to icehouses packed with sawdust. If the insulation was done properly, a ' +
+      'block cut in February would still be solid the following August. The whole industry ' +
+      'rested on an unlikely property of sawdust, which traps air so effectively that ice ' +
+      'surrounded by it melts astonishingly slowly. Fortunes were made and lost on the thickness ' +
+      'of a lake in a single cold season. When mechanical refrigeration arrived, the trade ' +
+      'vanished within a generation, and the icehouses were pulled down or converted into barns. ' +
+      'Almost nothing remains of it now except the occasional stone foundation near a shoreline.',
+  },
+  {
+    id: 'g7',
+    title: 'What the Maps Left Out',
+    grade: 7,
+    blurb: 'Abstract argument and subordinate clauses. Around one hundred and thirty five words.',
+    text:
+      'For most of the eighteenth century, mapmakers filled unknown territory with decoration. ' +
+      'Coastlines that had actually been surveyed were drawn with precision, and everything ' +
+      'beyond them was populated with mountains nobody had climbed and rivers nobody had ' +
+      'followed. This was not dishonesty so much as convention. A blank space looked like ' +
+      'carelessness, and a decorated one looked like knowledge. The shift came when a handful of ' +
+      'cartographers began leaving the interior deliberately empty, marking only what had been ' +
+      'measured. Contemporaries found the new maps unsettling and considerably less beautiful. ' +
+      'But an empty space is an argument. It tells the reader precisely where the evidence ' +
+      'stops, and it invites somebody to go and fill it in properly rather than trusting an ' +
+      'illustration.',
+  },
+  {
+    id: 'g8',
+    title: 'The Longitude Problem',
+    grade: 8,
+    blurb: 'Historical exposition with abstract reasoning. Around one hundred and thirty five words.',
+    text:
+      'Determining latitude at sea was straightforward for centuries, requiring only the angle ' +
+      'of the sun at noon. Longitude was another matter entirely, and it killed a great many ' +
+      'sailors. The underlying problem was time. Since the earth rotates at a predictable rate, ' +
+      'a navigator who knew the hour at a fixed reference point could calculate how far east or ' +
+      'west the ship had travelled. But no clock existed that could keep accurate time aboard a ' +
+      'rolling vessel through changes in temperature and humidity. Astronomers proposed ' +
+      'elaborate solutions involving the moons of Jupiter. The eventual answer came instead from ' +
+      'a carpenter with no formal scientific training, who spent decades building a sequence of ' +
+      'clocks until one of them finally kept time well enough to be trusted.',
+  },
+  {
+    id: 'g9',
+    title: 'The Overlooked Variable',
+    grade: 9,
+    blurb: 'Complex syntax and abstract argument. Around one hundred and forty words.',
+    text:
+      'In the middle of the nineteenth century a physician in Vienna noticed that women ' +
+      'delivering babies in one ward of his hospital died at several times the rate of those in ' +
+      'another. The wards were otherwise identical in ventilation, diet, and crowding, which ' +
+      'were the explanations medicine favoured at the time. The difference he eventually ' +
+      'isolated was that one ward was staffed by physicians who arrived directly from performing ' +
+      'autopsies, and the other by midwives who did not. His proposed remedy, washing hands in a ' +
+      'chlorine solution, reduced mortality dramatically and was rejected by nearly all of his ' +
+      'colleagues. The theory that would eventually explain why it worked was still decades ' +
+      'away, and a correct observation without a mechanism to justify it turns out to persuade ' +
+      'almost nobody.',
+  },
+  {
+    id: 'g10',
+    title: 'The Cost of Precision',
+    grade: 10,
+    blurb: 'Analytical prose with embedded clauses. Around one hundred and forty five words.',
+    text:
+      'Every measurement carries an error, and a great deal of scientific practice consists of ' +
+      'deciding how much error is tolerable. This is less obvious than it sounds. A quantity ' +
+      'measured to an unnecessary number of decimal places consumes resources that could have ' +
+      'been spent measuring something else, and it can create a false impression of certainty in ' +
+      'results that remain fundamentally approximate. The reverse failure is more familiar and ' +
+      'more dangerous. Instruments calibrated too coarsely will report consistent numbers that ' +
+      'are consistently wrong, and because they are consistent, the error is difficult to ' +
+      'detect. Experienced researchers therefore treat the question of precision as a design ' +
+      'decision rather than a technical detail, and they answer it before collecting anything at ' +
+      'all rather than afterwards when the data is already in hand.',
+  },
+  {
+    id: 'g11',
+    title: 'Reading the Rings',
+    grade: 11,
+    blurb: 'Sustained reasoning and technical vocabulary. Around one hundred and forty five words.',
+    text:
+      'A cross section of an old tree contains a climate record that can be read with reasonable ' +
+      'confidence, because a tree in a favourable year lays down a wider ring than a tree in a ' +
+      'poor one. The technique becomes powerful when samples overlap. A living tree provides a ' +
+      'sequence extending back through its own lifetime, and timber from an old building whose ' +
+      'outer rings match the inner rings of the living sample extends the record further. ' +
+      'Chained carefully, such sequences reach back thousands of years. What makes the method ' +
+      'persuasive is not any single sample but the requirement that independent sequences agree ' +
+      'with one another. A pattern appearing in one tree might be local circumstance. The same ' +
+      'pattern appearing in hundreds, across a region, is a climate.',
+  },
+  {
+    id: 'g12',
+    title: 'The Limits of the Instrument',
+    grade: 12,
+    blurb: 'Sophisticated abstraction and layered syntax. Around one hundred and fifty words.',
+    text:
+      'Any instrument shapes the questions that can be asked of it, and this is not a defect to ' +
+      'be engineered away but a permanent condition of measurement. A telescope sensitive to ' +
+      'visible light will produce an account of the universe composed entirely of objects that ' +
+      'emit visible light, and for a long period that account was mistaken for the universe ' +
+      'itself. The correction did not come from building better optical telescopes. It came from ' +
+      'instruments responding to radio waves, and later to other wavelengths, each revealing a ' +
+      'population of objects the previous generation of equipment had been structurally ' +
+      'incapable of detecting. The lesson generalises well beyond astronomy. Whenever a field ' +
+      'appears to have converged on a stable description of its subject, it is worth asking ' +
+      'which properties the available instruments cannot register at all.',
   },
 ]
 

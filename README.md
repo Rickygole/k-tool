@@ -47,7 +47,7 @@ bundled recording never passes as a kid's actual read.
 | Screen | File | Notes |
 |---|---|---|
 | Student select | `components/StudentSelect.jsx` | Drills down school level, then grade, then student. 65 mock students. No login, no roster sync, no database. |
-| Passage select | `components/PassageSelect.jsx` | Six original passages, grades 2 to 4, around 100 words each. |
+| Passage select | `components/PassageSelect.jsx` | Sixteen original passages, one per grade from K to 12. At-grade ones come first, the rest are still offered. |
 | Read | `components/ReadScreen.jsx` | Passage at 24px serif, one record button, running timer, live input meter. |
 | Results | `components/Results.jsx` | Marked passage, metric cards, miscue table with teacher override. |
 | Student view | `components/StudentResult.jsx` | Same read, shown to the kid. No percentile, no instructional level. |
