@@ -80,7 +80,7 @@ export function MiscueList({ errors, events, onOverride }) {
                     {row.overridden ? 'Undo' : 'Not an error'}
                     <span className="sr-only">
                       {' '}
-                      — {row.label} of “{row.expected}”
+                      {row.label} of “{row.expected}”
                     </span>
                   </button>
                 </td>

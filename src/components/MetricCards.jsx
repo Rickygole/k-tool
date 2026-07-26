@@ -4,9 +4,9 @@ import { formatDuration } from '../util/markup.js'
 const SEASON_INDEX = { fall: 0, winter: 1, spring: 2 }
 
 const LEVEL_COPY = {
-  independent: { label: 'Independent', detail: '95% accuracy or above — this text can be read alone.' },
-  instructional: { label: 'Instructional', detail: '90–94% accuracy — right level for guided instruction.' },
-  frustration: { label: 'Frustration', detail: 'Below 90% accuracy — this text is too hard unsupported.' },
+  independent: { label: 'Independent', detail: '95% accuracy or above. This text can be read alone.' },
+  instructional: { label: 'Instructional', detail: '90 to 94% accuracy. The right level for guided instruction.' },
+  frustration: { label: 'Frustration', detail: 'Below 90% accuracy. This text is too hard without support.' },
 }
 
 /**
@@ -35,7 +35,7 @@ export function percentileCopy(band, wcpm, grade, season) {
   if (band == null || band === 10) {
     const floor = row?.[10]?.[idx]
     if (floor != null && wcpm >= floor) {
-      return { value: '10th–25th', detail: `At or above the 10th percentile, below the 25th (${row[25][idx]} WCPM).` }
+      return { value: '10th to 25th', detail: `At or above the 10th percentile, below the 25th (${row[25][idx]} WCPM).` }
     }
     return {
       value: 'Below 10th',
@@ -111,7 +111,7 @@ export function MetricCards({ metrics, passage, student, season, onSeasonChange 
         <Tile label="Percentile band" value={pct.value} detail={pct.detail} valueSize="text-2xl" />
         {outOfLevel && (
           <p className="col-span-2 text-xs leading-relaxed" style={{ color: 'var(--ra-muted)' }}>
-            Compared against <strong>grade {passage.grade}</strong> — the passage — not{' '}
+            Compared against <strong>grade {passage.grade}</strong>, which is the passage, not{' '}
             {student.grade === 0 ? 'kindergarten' : `grade ${student.grade}`}, this student&rsquo;s own.
             {beyondNorms && ' Published fluency norms stop at grade 6, so no comparison to their year group exists.'}
           </p>
@@ -136,7 +136,7 @@ export function MetricCards({ metrics, passage, student, season, onSeasonChange 
           ))}
         </select>
         <p className="mt-3 text-xs leading-relaxed" style={{ color: 'var(--ra-muted)' }}>
-          Norms are reported as bands, not point estimates — a five-row table cannot support a claim
+          Norms are reported as bands, not point estimates. A five row table cannot support a claim
           like &ldquo;37th percentile&rdquo;. {CITATION}
         </p>
       </div>

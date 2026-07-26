@@ -31,7 +31,7 @@ export function UnscoreableRead({ student, passage, validity, onReadAgain, onRes
         <div className="mt-5">
           <h3 className="field-label">Before recording again</h3>
           <ul className="mt-2 space-y-1.5 text-sm" style={{ color: 'var(--ra-muted)' }}>
-            <li>· Check that the input meter moves when the reader speaks — that is the fastest test.</li>
+            <li>· Check that the input meter moves when the reader speaks. That is the fastest test.</li>
             <li>· Confirm the right microphone is selected in the browser&rsquo;s site settings.</li>
             <li>· Let the reader finish the passage before pressing Stop.</li>
           </ul>

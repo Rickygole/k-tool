@@ -62,7 +62,7 @@ describe('A. the suppression stack must not erase real substitutions', () => {
 })
 
 // ═══════════════ 2. THE DIALECT LAYER'S OWN LINGUISTIC CLAIMS ═══════════════
-describe('B. dialect.js — linguistic correctness', () => {
+describe('B. dialect.js linguistic correctness', () => {
   it('g-dropping applies to the -ing SUFFIX only, never monomorphemic sing/king/thing', () => {
     for (const [a, b] of [['sing', 'sin'], ['king', 'kin'], ['thing', 'thin'], ['ring', 'rin'], ['wing', 'win']]) {
       expect(dialectMatch(a, b).matched, `${a}/${b} must not be a dialect variant`).toBe(false)
@@ -132,7 +132,7 @@ describe('C. does the dialect layer do anything on transcripts Whisper actually 
     const on = score(REF, asr(hyp)).metrics.errors
     const off = score(REF, asr(hyp), { dialectLayer: false }).metrics.errors
     console.log(`normalised: errors on=${on} off=${off} delta=${off - on}`)
-    expect(off - on).toBe(0)   // the layer is inert here — this test PASSES, and that is the problem
+    expect(off - on).toBe(0)   // the layer is inert here, this test PASSES, and that is the problem
   })
 
   it('on the MEASURED transcript with MANGLED boundaries the layer also changes nothing', () => {

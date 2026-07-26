@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { Fragment, useMemo } from 'react'
 import { buildUnits, explainUnit, unitGlyph } from '../util/markup.js'
 
 const SEVERITY_CLASS = {
@@ -55,43 +55,51 @@ export function PassageMarkup({ tokens, interactive = true, idPrefix = 'w' }) {
         const tooltipId = `${idPrefix}-tip-${unit.indexes[0]}`
 
         return (
-          <span key={`${idPrefix}${unit.indexes[0]}`} className="whitespace-nowrap">
-            <mark
-              className={[
-                'word',
-                'relative inline-block',
-                SEVERITY_CLASS[unit.severity],
-                omitted ? 'word-omitted' : '',
-                interactive ? 'word-interactive' : '',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              tabIndex={interactive ? 0 : undefined}
-              aria-describedby={interactive ? tooltipId : undefined}
-            >
-              {inserted && (
-                <span aria-hidden="true" className="opacity-60">
-                  ^
-                </span>
-              )}
-              {unit.display}
-              {glyph && (
-                <span className="word-glyph" aria-hidden="true">
-                  {glyph}
-                </span>
-              )}
-              {/* aria-hidden AND referenced by aria-describedby, which is not a contradiction:
-                  the accessible-description computation deliberately reads hidden nodes when
-                  they are directly referenced. So the explanation is announced when the word
-                  takes focus, and is NOT read again as part of the passage when a screen
-                  reader user reads straight through it. */}
-              {interactive && (
-                <span id={tooltipId} className="tooltip" aria-hidden="true">
-                  <span className="font-semibold">{unit.display || '(extra word)'}</span> — {description}
-                </span>
-              )}
-            </mark>{' '}
-          </span>
+          // The nowrap wrapper holds the word together with its superscript glyph so they can
+          // never be split across a line. The separating space lives OUTSIDE it, below, and that
+          // placement is the whole point: with the space inside, a run of consecutive marked
+          // words had no break opportunity anywhere in it (JSX drops the whitespace between
+          // sibling elements), so a heavily marked passage rendered as one unbreakable chain and
+          // ran straight off the edge of the card.
+          <Fragment key={`${idPrefix}${unit.indexes[0]}`}>
+            <span className="whitespace-nowrap">
+                <mark
+                className={[
+                  'word',
+                  'relative inline-block',
+                  SEVERITY_CLASS[unit.severity],
+                  omitted ? 'word-omitted' : '',
+                  interactive ? 'word-interactive' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                tabIndex={interactive ? 0 : undefined}
+                aria-describedby={interactive ? tooltipId : undefined}
+              >
+                {inserted && (
+                  <span aria-hidden="true" className="opacity-60">
+                    ^
+                  </span>
+                )}
+                {unit.display}
+                {glyph && (
+                  <span className="word-glyph" aria-hidden="true">
+                    {glyph}
+                  </span>
+                )}
+                {/* aria-hidden AND referenced by aria-describedby, which is not a contradiction:
+                    the accessible-description computation deliberately reads hidden nodes when
+                    they are directly referenced. So the explanation is announced when the word
+                    takes focus, and is NOT read again as part of the passage when a screen
+                    reader user reads straight through it. */}
+                {interactive && (
+                  <span id={tooltipId} className="tooltip" aria-hidden="true">
+                    <span className="font-semibold">{unit.display || '(extra word)'}</span>: {description}
+                  </span>
+                )}
+              </mark>
+            </span>{' '}
+          </Fragment>
         )
       })}
     </p>

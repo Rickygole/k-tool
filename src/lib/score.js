@@ -255,7 +255,7 @@ export function score(referenceText, asrResult, options = {}) {
     // word", which cannot be right. Under that rule the extra word in "the little red fox"
     // would score as a self-correction, because it too is followed by a correctly read word.
     // We require the attempt to actually resemble the target, which catches partial words
-    // ("w— woods") and near-misses ("wood woods").
+    // ("w. woods") and near misses ("wood woods").
     //
     // Accepted limitation, stated in EVAL.md: a purely semantic self-correction ("forest ...
     // woods") is indistinguishable from a plain insertion without a language model, and we

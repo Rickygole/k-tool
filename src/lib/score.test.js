@@ -22,7 +22,7 @@ function asr(text, durationSec = 60) {
 const statuses = (result) => result.tokens.map((t) => t.status)
 const countOf = (result, status) => statuses(result).filter((s) => s === status).length
 
-describe('score() — the ten cases', () => {
+describe('score() the ten cases', () => {
   it('1. perfect read has zero errors', () => {
     const r = score(PASSAGE, asr(PASSAGE))
     expect(r.metrics.errors).toBe(0)
@@ -129,7 +129,7 @@ describe('score() — the ten cases', () => {
   })
 })
 
-describe('documented limitations — these assert what we CANNOT do', () => {
+describe('documented limitations, these assert what we CANNOT do', () => {
   it('scores a purely semantic self-correction as an insertion', () => {
     // "forest ... woods" is a real self-correction, but nothing short of a language model can
     // tell it apart from an extra word, and we deliberately have no language model. We take
@@ -267,7 +267,7 @@ describe('metrics arithmetic', () => {
   })
 })
 
-describe('hardening — findings from the review gate', () => {
+describe('hardening, findings from the review gate', () => {
   it('never throws on a null or malformed ASR result', () => {
     // A raw TypeError here takes the React tree down to a white screen mid-demo.
     expect(() => score(PASSAGE, null)).not.toThrow()

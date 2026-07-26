@@ -85,7 +85,7 @@ export function TeacherReport({ student, passage, read, tokens, metrics, season,
 
         {read.source === 'demo' && (
           <p className="mt-3 border border-black px-3 py-1.5 text-xs font-semibold">
-            DEMO RECORDING — scored from a bundled audio file, not from this student&rsquo;s voice.
+            DEMO RECORDING. Scored from a bundled audio file, not from this student&rsquo;s voice.
           </p>
         )}
 
@@ -133,7 +133,7 @@ export function TeacherReport({ student, passage, read, tokens, metrics, season,
                     <td>{row.expected}</td>
                     <td>{row.heard}</td>
                     <td>{row.label}</td>
-                    <td>{row.overridden ? 'No — teacher override' : 'Yes'}</td>
+                    <td>{row.overridden ? 'No, teacher override' : 'Yes'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -154,7 +154,7 @@ export function TeacherReport({ student, passage, read, tokens, metrics, season,
             </h4>
             <p className="text-xs leading-relaxed">
               {suppressed
-                .map((s) => `“${s.expected}” heard as “${s.heard}” — ${s.reason.toLowerCase()}${s.rules.length ? ` (${s.rules.join(', ')})` : ''}`)
+                .map((s) => `“${s.expected}” heard as “${s.heard}”, ${s.reason.toLowerCase()}${s.rules.length ? ` (${s.rules.join(', ')})` : ''}`)
                 .join('; ')}
               .
             </p>

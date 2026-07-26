@@ -15,7 +15,7 @@ const STEPS = [
  * user navigating by heading needs the document outline to describe the app, and an h1 per
  * screen would tell them they had landed on four different websites.
  */
-export function AppHeader({ step, student, passage, onNavigate }) {
+export function AppHeader({ step, student, passage, onNavigate, onHome }) {
   const index = STEPS.findIndex((s) => s.id === step)
 
   return (
@@ -25,7 +25,21 @@ export function AppHeader({ step, student, passage, onNavigate }) {
     >
       <div className="mx-auto flex min-w-[1024px] max-w-[1400px] items-center gap-8 px-8 py-3">
         <div className="flex items-baseline gap-3">
-          <h1 className="font-display text-xl font-semibold tracking-tight">ReadAloud</h1>
+          {/* The wordmark goes home, which is what people try first. It runs the same reset that
+              "New assessment" runs rather than a second path of its own, so there is only one
+              way for a session to end and only one thing to get wrong. Nothing is persisted, so
+              there is no saved record for this to discard. */}
+          <h1 className="font-display text-xl font-semibold tracking-tight">
+            <button
+              type="button"
+              onClick={onHome}
+              className="rounded transition hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-harbor focus-visible:ring-offset-2"
+              title="Start a new assessment"
+            >
+              ReadAloud
+              <span className="sr-only">, start over</span>
+            </button>
+          </h1>
           <p className="text-xs" style={{ color: 'var(--ra-muted)' }}>
             Oral reading fluency
           </p>
@@ -112,7 +126,7 @@ function StepChip({ state, reachable, onClick, index, label, detail }) {
       className="rounded px-1 py-0.5 transition hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-harbor"
     >
       {body}
-      <span className="sr-only">— go back to this step</span>
+      <span className="sr-only">, go back to this step</span>
     </button>
   )
 }

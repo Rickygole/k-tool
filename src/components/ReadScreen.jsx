@@ -272,7 +272,7 @@ function RecordButton({ phase, onStart, onStop }) {
           {processing ? 'Working…' : recording ? 'Stop' : 'Start recording'}
         </span>
         <span className="block text-xs" style={{ color: 'var(--ra-muted)' }}>
-          {recording ? 'Recording — audio stays on this device' : 'Then read the passage aloud'}
+          {recording ? 'Recording. Audio stays on this device' : 'Then read the passage aloud'}
         </span>
       </span>
     </button>

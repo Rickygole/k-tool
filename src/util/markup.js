@@ -56,7 +56,7 @@ export function dialectRuleExample(id) {
 /** Why a mismatch was not counted as an error, in words a teacher would use. */
 export const SUPPRESSION_REASON = {
   dialect: 'Dialect feature, not a decoding error',
-  homophone: 'Homophone — indistinguishable by ear',
+  homophone: 'Homophone, indistinguishable by ear',
   fuzzy: 'Near-identical word; likely a transcription artifact',
   phonetic: 'Sounds alike; the recogniser may have misheard it',
   contraction: 'Contraction written the other way round',

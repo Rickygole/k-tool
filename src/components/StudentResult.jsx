@@ -74,7 +74,7 @@ export function StudentResult({ student, tokens, metrics, onBack }) {
           {fixed > 0 && (
             <p className="mt-2 text-lg" style={{ color: 'var(--ra-correct)' }}>
               And you fixed <strong className="tabular-nums">{fixed}</strong>{' '}
-              {fixed === 1 ? 'word' : 'words'} all by yourself — that's the hardest part of reading.
+              {fixed === 1 ? 'word' : 'words'} all by yourself. That is the hardest part of reading.
             </p>
           )}
         </div>

@@ -200,7 +200,13 @@ export default function App() {
         Skip to main content
       </a>
 
-      <AppHeader step={headerStep} student={student} passage={passage} onNavigate={handleNavigate} />
+      <AppHeader
+        step={headerStep}
+        student={student}
+        passage={passage}
+        onNavigate={handleNavigate}
+        onHome={restart}
+      />
 
       <main id="main" className="mx-auto min-w-[1024px] max-w-[1400px] px-8 py-10">
         {step === 'student' && (

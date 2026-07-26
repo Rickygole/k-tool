@@ -28,7 +28,7 @@ export function ModelStatus() {
   if (asr.status === 'error') {
     return (
       <p className="max-w-xs text-xs" style={{ color: 'var(--ra-miscue)' }} role="status">
-        Speech model failed to load — {asr.error}
+        Speech model failed to load. {asr.error}
       </p>
     )
   }
