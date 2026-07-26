@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn-primary {
+    @apply bg-harbor text-mist px-6 py-3 rounded-lg font-medium transition active:scale-[0.98]
+      hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-harbor/50 focus-visible:ring-offset-2;
+  }
+  .card {
+    @apply bg-white border border-harbor/20 rounded-2xl p-6 shadow-sm;
+  }
+  .alert-error {
+    @apply px-4 py-3 bg-miscue-bg text-miscue rounded-lg text-sm;
+  }
+}
+
+/* Students with vestibular disorders, migraine, or motion sensitivity are squarely in this
+   app's audience. Honour the OS setting instead of animating regardless. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+  .print-area {
+    position: absolute;
+    inset: 0;
+    padding: 2rem;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
