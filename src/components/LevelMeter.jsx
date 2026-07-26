@@ -19,7 +19,7 @@ const SILENCE_MS = 2500
  * contains a hundred-word passage. The rAF loop writes to DOM nodes it owns through refs, and
  * React only hears about the one thing that is genuinely state: whether we have gone quiet.
  *
- * The needle is smoothed asymmetrically -- fast attack, slow release -- which is what every
+ * The needle is smoothed asymmetrically: fast attack, slow release, which is what every
  * hardware meter does, because a meter that tracks RMS exactly looks broken to a human eye.
  */
 export function LevelMeter({ recorderRef, active }) {

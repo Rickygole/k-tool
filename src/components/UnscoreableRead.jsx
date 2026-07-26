@@ -2,7 +2,7 @@
  * What the app shows when the engine says the recording cannot be scored.
  *
  * `score()` returns a `validity` verdict for a specific failure mode: a microphone that failed
- * silently. A dead mic does not throw — it returns silence, and silence aligns as a complete
+ * silently. A dead mic does not throw. It returns silence, and silence aligns as a complete
  * read with every word omitted. Rendered normally that produces a confident, printable running
  * record showing 22% accuracy and a bottom-percentile band for a child who never spoke.
  *

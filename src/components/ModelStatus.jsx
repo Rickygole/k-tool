@@ -6,7 +6,7 @@ import { useAsrState, overallProgress } from '../hooks/useAsr.js'
  * The model is tens of megabytes and downloads once, then lives in IndexedDB and never touches
  * the network again. Both halves of that sentence matter to the person watching: during the
  * first load they need to know the app is working and not hung, and afterwards they need to
- * see that it is running locally -- because "the audio never leaves this device" is a claim
+ * see that it is running locally, because "the audio never leaves this device" is a claim
  * about student privacy, and a claim like that should be visible in the interface rather than
  * only in the pitch.
  */

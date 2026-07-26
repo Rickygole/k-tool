@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
  * Reading-support controls: typeface, text size, contrast.
  *
  * These are not a settings page. A child who needs larger text needs it *now*, mid-passage,
- * without a teacher navigating away from the read -- so the controls sit in the header on
+ * without a teacher navigating away from the read. So the controls sit in the header on
  * every screen and take effect on the next paint.
  *
  * Everything is applied as data-attributes on <html> and resolved in CSS (styles/index.css).
@@ -97,7 +97,7 @@ export function AccessibilityBar() {
 /**
  * aria-pressed rather than a checkbox: these are toggle buttons whose effect is immediate and
  * global. The pressed state is carried by border + weight + a filled dot, never by colour
- * alone -- these controls are the ones a colour-blind user reaches for first.
+ * alone. These controls are the ones a colour-blind user reaches for first.
  */
 function ToggleButton({ pressed, onClick, title, children, wide }) {
   return (

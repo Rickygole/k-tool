@@ -1,13 +1,14 @@
 # ReadAloud
 
-Browser-only oral reading fluency assessment. A student reads a passage aloud, and the tool
-produces a running record — marked-up text, WCPM, accuracy, self-correction rate, instructional
-level, and a percentile band against published norms — with a printable one-page teacher report.
+Oral reading fluency assessment that runs entirely in the browser. A student reads a passage out
+loud, and you get a running record back: the marked up text, words correct per minute, accuracy,
+self correction rate, instructional level, and a percentile band. Plus a one page report you can
+print and hand to someone.
 
-Everything runs in the browser. The speech model is downloaded once, cached in IndexedDB, and
-runs on-device from then on. **No audio and no transcript ever leaves the machine, and there is
-no server to leave it to.** For a tool that records children's voices, that is a design
-constraint rather than a feature.
+The speech model downloads once, gets cached, and runs on the device after that. **No audio and no
+transcript ever leaves the machine, and there's no server for it to leave to.** For something that
+records kids reading out loud, that felt less like a feature and more like the only acceptable way
+to build it.
 
 ## Running it
 
@@ -18,113 +19,119 @@ npm run test     # scoring engine unit tests
 npm run build
 ```
 
-Port 5174 is fixed (`strictPort`). The model cache is keyed to the origin, so a port change
-means re-downloading tens of megabytes of weights.
+Port 5174 is pinned on purpose (`strictPort`). The model cache is keyed to the origin, so if the
+port changes you're re-downloading tens of megabytes of weights. If `npm run dev` refuses to start,
+something else has the port: `lsof -ti :5174 | xargs kill`.
 
-Desktop only, 1024px and up. Mobile layout is an explicit non-goal.
+Desktop only, 1024px and up. Mobile layout was never a goal here.
 
-## Demo mode — `Ctrl` + `Shift` + `D`
+## Demo mode: Ctrl + Shift + D
 
-Loads `public/demo/clean-read.wav` and runs it through the **real** pipeline: decode to 16kHz
-mono, Whisper in the worker, the same scorer, the same screens. The only thing substituted is
-where the audio samples came from.
+Loads `public/demo/clean-read.wav` and pushes it through the **real** pipeline. Same decode to
+16kHz mono, same Whisper worker, same scorer, same screens. The only thing that changes is where
+the audio samples came from.
 
-It exists because a live demo depends on hardware nobody controls — a room with three hundred
-people in it is loud, laptop microphones get muted by the OS, and permission dialogs get
-dismissed by whoever used the machine last. Because it runs the genuine pipeline rather than
-replaying a canned result, it cannot quietly drift away from the product.
+It's there because live demos depend on hardware you don't control. Rooms are loud, laptop mics get
+muted by the OS, and permission dialogs get dismissed by whoever used the machine last. Since it
+runs the actual pipeline instead of replaying a saved result, it can't quietly drift away from what
+the product really does.
 
-The hotkey also switches to a bundled passage (`DEMO_PASSAGE` in `src/data/passages.js`), which
-is the text that recording actually reads. Pointing the audio at any other passage would produce
-a wall of false omissions. **That wav file and that passage are a matched pair — change one and
-you must re-record the other.** Anything scored this way is labelled as a demo recording on
-screen and on the printed report; a bundled recording never passes as a child's read.
+The hotkey also swaps in a bundled passage (`DEMO_PASSAGE` in `src/data/passages.js`), because that
+wav is a recording of that specific text. Point the audio at any other passage and you get a wall
+of false omissions. **The wav and the passage are a matched pair. Change one, re-record the other.**
+Anything scored this way gets labelled as a demo recording on screen and on the printout, so a
+bundled recording never passes as a kid's actual read.
 
 ## The screens
 
 | Screen | File | Notes |
 |---|---|---|
-| Student select | `components/StudentSelect.jsx` | Five mock students. No login, no roster sync, no database — all explicit non-goals. |
-| Passage select | `components/PassageSelect.jsx` | Five original passages, grades 2–4, ~100 words each. |
+| Student select | `components/StudentSelect.jsx` | Drills down school level, then grade, then student. 65 mock students. No login, no roster sync, no database. |
+| Passage select | `components/PassageSelect.jsx` | Six original passages, grades 2 to 4, around 100 words each. |
 | Read | `components/ReadScreen.jsx` | Passage at 24px serif, one record button, running timer, live input meter. |
 | Results | `components/Results.jsx` | Marked passage, metric cards, miscue table with teacher override. |
-| Teacher report | `components/TeacherReport.jsx` | `.print-area` one-pager. Survives Cmd+P onto a black-and-white printer. |
+| Student view | `components/StudentResult.jsx` | Same read, shown to the kid. No percentile, no instructional level. |
+| Teacher report | `components/TeacherReport.jsx` | `.print-area` one pager. Survives Cmd+P onto a black and white printer. |
 
-## Design decisions worth knowing
+## Decisions worth knowing about
 
-**Colour is never the only signal.** Every marked word carries a glyph (`S` substitution, `O`
-omission, `I` insertion, `SC` self-correction, `R` repetition, `?` not counted) and an underline
-style — solid, wavy, dotted, or strikethrough. Roughly one man in twelve has a red-green
-deficiency, and the report prints on the black-and-white printer down the hall from the
-classroom. Marking that only worked in colour would only work for some people.
+**Colour is never the only signal.** Every marked word gets a glyph too (`S` substitution, `O`
+omission, `I` insertion, `SC` self correction, `R` repetition, `?` not counted) plus an underline
+style: solid, wavy, dotted, or struck through. Roughly one man in twelve has some red green
+deficiency, and the report is going to come out of the black and white printer down the hall.
+Marking that only works in colour only works for some people.
 
-**Amber is the product's epistemic humility, made visible.** A word we heard differently but
-declined to count as an error is amber, never silently green. Hover or tab to it and it says what
-was heard and why — including the dialect rule that fired, by name. The full list is itemised on
-the results screen and on the printed report, so the adjustment can be checked rather than taken
-on trust. A silent pass would be worse than no pass at all.
+**Amber means we're not sure, and we're saying so.** If we heard a word differently but decided not
+to count it as an error, it goes amber, never silently green. Hover or tab to it and it tells you
+what was heard and why, including which dialect rule fired, by name. The whole list is itemised on
+the results screen and on the printout so you can check the call instead of trusting it. A silent
+pass would be worse than no pass at all.
 
-**The teacher can always overrule the machine.** "Not an error" is one click on any miscue, it is
-reversible, and every metric recomputes from it immediately. Insertions have no reference index,
-so `score()`'s `options.overrides` map cannot address them; the UI applies those positionally and
-recomputes through the engine's own `computeMetrics` (see the comment in `App.jsx`).
+**The teacher can always overrule the machine, in both directions.** "Not an error" is one click on
+any miscue, it's reversible, and every number recomputes right away. You can also go the other way
+and count a word the engine let through as an error. That second direction matters more than it
+looks: there are four filters in here that can only ever *remove* errors, so if the only control a
+teacher had was the power to forgive, every adjustment the tool offered would push the score up.
+That's not a tool anyone should believe.
 
-**An unscoreable recording produces nothing.** A dead microphone does not throw — it returns
-silence, which aligns as a complete read with every word omitted and would render a confident,
-printable record showing bottom-percentile accuracy for a child who never spoke. When the engine's
-validity check fails, there is no score, no percentile, and no route to the report.
+**An unscoreable recording produces nothing at all.** A dead mic doesn't throw an error, it returns
+silence. Silence lines up as a complete read with every word omitted, which would render a
+confident, printable record showing bottom percentile accuracy for a kid who never said anything.
+So when the validity check fails there's no score, no percentile, and no way through to the report.
 
-**Reading supports persist.** Dyslexia-friendly typeface, three text sizes, and high contrast sit
-in the header on every screen and save to `localStorage`. The dyslexia setting is a **font stack**,
-not a webfont — fetching one would make an accessibility toggle depend on the network, and this
-app has to work in a classroom with no wifi.
+**Reading supports stick around.** Dyslexia friendly typeface, three text sizes, high contrast.
+They live in the header on every screen and save to `localStorage`. The dyslexia setting is a
+**font stack**, not a webfont, because fetching one would make an accessibility toggle depend on
+the network and this thing has to work in a classroom with no wifi.
 
 ## Layout
 
 ```
 src/
-  lib/        scoring engine, ASR worker, audio. Tested and committed — add files, don't edit.
-  data/       mock students, original passages
-  hooks/      useAsr — the single ASR worker connection
-  util/       markup.js — turns aligner-shaped tokens into page-shaped units
-  components/ the five screens and their parts
+  lib/        scoring engine, ASR worker, audio. Tested and committed. Add files, don't edit.
+  data/       mock roster, original passages
+  hooks/      useAsr, the single ASR worker connection
+  util/       markup.js, turns aligner shaped tokens into page shaped units
+  components/ the screens and their parts
 ```
 
-Plain JavaScript and JSX. Tailwind for styling, and no other UI dependency of any kind.
+Plain JavaScript and JSX. Tailwind for styling and no other UI dependency of any kind.
 
 ## Norms and sources
 
-Every figure in `src/lib/norms.js` was checked digit-by-digit against the primary source, not
-copied from a secondary table. Two of the six commonly-quoted spring medians circulate in a
-1996-era form; grade 4 is 133 and grade 6 is 146 in the 2017 revision.
+Every number in `src/lib/norms.js` got checked digit by digit against the actual source instead of
+copied off a secondary table, which turned out to matter. Two of the six commonly quoted spring
+medians still float around in a 1996 era form. Grade 4 is 133 and grade 6 is 146 in the 2017
+revision.
 
 **Fluency measurement**
-- Hasbrouck, J., & Tindal, G. (2017). *An update to compiled ORF norms* (Technical Report
-  No. 1702). Behavioral Research and Teaching, University of Oregon. — the norm table.
+- Hasbrouck, J., & Tindal, G. (2017). *An update to compiled ORF norms* (Technical Report No.
+  1702). Behavioral Research and Teaching, University of Oregon. This is the norm table itself.
 - Fuchs, L. S., Fuchs, D., Hosp, M. K., & Jenkins, J. R. (2001). Oral reading fluency as an
-  indicator of reading competence. *Scientific Studies of Reading*, 5(3), 239–256. — why words
-  correct per minute is a defensible proxy for reading competence at all.
+  indicator of reading competence. *Scientific Studies of Reading*, 5(3), 239 to 256. This is why
+  words correct per minute is a defensible thing to measure in the first place.
 
-**Why the suppression layer exists** — these sit behind the amber column and the equity claim:
+**Why there's a suppression layer at all.** These are what sit behind the amber column:
 - Labov, W., & Baker, B. (2010). What is a reading error? *Applied Psycholinguistics*, 31(4).
-- Charity, A. H., Scarborough, H. S., & Griffin, D. M. (2004). Familiarity with school English
-  in African American children. *Child Development*, 75(5).
-- Goodman, K. S., & Buck, C. (1973). Dialect barriers to reading comprehension revisited.
-  *The Reading Teacher*, 27(1).
-- Koenecke, A., et al. (2020). Racial disparities in automated speech recognition. *PNAS*,
-  117(14). — roughly double the word error rate for Black speakers across all five major
-  commercial recognisers. This is the measured bias the tool is built against.
+- Charity, A. H., Scarborough, H. S., & Griffin, D. M. (2004). Familiarity with school English in
+  African American children. *Child Development*, 75(5).
+- Goodman, K. S., & Buck, C. (1973). Dialect barriers to reading comprehension revisited. *The
+  Reading Teacher*, 27(1).
+- Koenecke, A., et al. (2020). Racial disparities in automated speech recognition. *PNAS*, 117(14).
+  Roughly double the word error rate for Black speakers across all five major commercial
+  recognisers. That's the measured bias this thing is built against.
 
-Percentiles are reported as **bands**, not point estimates. A five-row table cannot support a claim
-like "37th percentile", and pretending otherwise is the kind of false precision that makes an
-assessment tool untrustworthy. A score below the published 10th percentile reports `below_10`
-rather than "10th percentile", and grades outside the published table report no band at all.
+Percentiles come back as **bands**, not point estimates. A five row table can't support a claim
+like "37th percentile", and pretending it can is the kind of false precision that makes an
+assessment tool untrustworthy. Below the published 10th percentile reports `below_10` instead of
+"10th percentile", and grades outside the table report no band at all rather than a guess.
 
-Automated scoring is a screening aid. It does not replace teacher judgement — and the teacher can
-push in **both** directions: any flagged word can be marked correct, and any word the engine
-suppressed can be counted as an error. That symmetry is deliberate. Every other degree of freedom
-in the system (four suppression filters) can only lower the error count, and a tool whose every
-adjustment pushed the score upward would not deserve to be believed.
+One more thing on the percentile: it's calculated from the **passage** grade, not the student's. So
+a grade 8 kid reading a grade 3 passage at the 50th percentile means they read grade 3 text at a
+typical grade 3 pace. It does not mean typical for grade 8. The results screen says so directly
+whenever the two grades don't match, because that's an easy number to misread.
 
-`EVAL.md` reports what the evaluation actually measured, including a headline feature that fired
-zero times and why.
+Automated scoring is a screening aid. It doesn't replace teacher judgement.
+
+`EVAL.md` has what the evaluation actually measured, including a headline feature that fired zero
+times and why we published that anyway.

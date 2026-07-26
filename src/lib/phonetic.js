@@ -34,7 +34,7 @@ export function soundex(word) {
 
     if (code) {
       // Adjacent identical codes collapse, unless separated by a vowel (h and w are
-      // transparent and do NOT break the run -- that is the classic Soundex subtlety).
+      // transparent and do NOT break the run. That is the classic Soundex subtlety).
       if (code !== prev) out += code
       prev = code
     } else if (ch !== 'h' && ch !== 'w') {
@@ -48,7 +48,7 @@ export function soundex(word) {
 /**
  * Phonetic match gate.
  *
- * Soundex alone is far too permissive for scoring a child's reading -- it happily equates
+ * Soundex alone is far too permissive for scoring a child's reading. It happily equates
  * "rest" and "roast". Two extra conditions do most of the work of a better algorithm:
  *   - same first letter (already implied by Soundex, kept explicit for readability)
  *   - similar length, so "cat" cannot match "acquainted"
@@ -66,7 +66,7 @@ export function phoneticMatch(a, b) {
   if (bothCommon(a, b)) return false
 
   // A word and its own inflection are never a phonetic coincidence. Soundex ignores most
-  // suffixes, so `dogs`/`dog`, `lived`/`left` and `showed`/`said` were all passing -- erasing
+  // suffixes, so `dogs`/`dog`, `lived`/`left` and `showed`/`said` were all passing, erasing
   // plural, tense and comprehension-breaking substitutions from real reports. `bothCommon`
   // could not catch these: no word list contains every inflected form, and on this project's
   // own eval passages 100% of inflected forms were missing from it.
@@ -76,7 +76,7 @@ export function phoneticMatch(a, b) {
 
   // Soundex alone is far too coarse to carry this filter. It ignores vowels entirely, so
   // `showed`/`said`, `lived`/`left`, `garden`/`gordon` and `farmers`/`framers` all share a key
-  // -- and the last two are PLANTED SUBSTITUTIONS in our own eval, being forgiven as phonetic
+  //. And the last two are PLANTED SUBSTITUTIONS in our own eval, being forgiven as phonetic
   // near-misses. The filter was lowering our substitution recall, not raising it.
   //
   // Two extra conditions do the work Soundex cannot. The first two letters must agree, which is

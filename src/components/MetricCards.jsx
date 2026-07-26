@@ -13,7 +13,7 @@ const LEVEL_COPY = {
  * What we are actually allowed to say about a percentile.
  *
  * `percentileBand` returns the highest published percentile the reader meets or exceeds, and
- * the exact meaning of its bottom return value has moved more than once — at one point a
+ * the exact meaning of its bottom return value has moved more than once, at one point a
  * returned 10 meant "below the 25th" because the 10th-percentile row was never tested. Printing
  * "at or above the 10th percentile" on that would be a claim the function never made.
  *
@@ -54,7 +54,7 @@ const SEASONS = [
 /**
  * The numbers, and what they are worth.
  *
- * One hero figure — words correct per minute — because that is the number that goes in the
+ * One hero figure, words correct per minute, because that is the number that goes in the
  * gradebook and everything else is context for it. The four supporting tiles are the same
  * size as each other and smaller than the hero, so the hierarchy is readable before a word is.
  *
@@ -67,7 +67,7 @@ export function MetricCards({ metrics, passage, student, season, onSeasonChange 
   const level = LEVEL_COPY[metrics.level]
 
   // Out-of-level reading. The percentile is computed from the PASSAGE's grade, so when the two
-  // grades differ the band is not a statement about this child's year group -- and a teacher
+  // grades differ the band is not a statement about this child's year group. And a teacher
   // glancing at "50th percentile" would reasonably assume it was. Shown here, next to the
   // number, rather than back on the roster screen where there is nothing yet to interpret.
   const outOfLevel = student && student.grade !== passage.grade
@@ -161,7 +161,7 @@ function Tile({ label, value, detail, valueSize }) {
  *
  * The scale runs to 1.6x the median so the median tick sits at a consistent place across
  * grades and the bar never pins. The unfilled track is a light step of the fill's own hue, and
- * the direction of the comparison is stated in words above the bar — the colour is the third
+ * the direction of the comparison is stated in words above the bar. The colour is the third
  * signal, not the first.
  */
 function BenchmarkMeter({ wcpm, median, grade, season }) {

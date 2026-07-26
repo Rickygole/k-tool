@@ -3,7 +3,7 @@
  *
  * This exists because a fatal bug shipped behind a green test suite: the worker passed
  * `language: 'en'` to an English-only checkpoint, transformers.js threw on every call, and
- * nothing caught it -- because the unit tests never touch the model and the eval harness used
+ * nothing caught it, because the unit tests never touch the model and the eval harness used
  * its own hand-written options rather than the worker's.
  *
  * So this imports the exact same options module the worker imports, and asserts on real model

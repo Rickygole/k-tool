@@ -2,7 +2,7 @@
  * Needleman-Wunsch global alignment over token sequences.
  *
  * Passages are ~100 words, so the full (m+1)x(n+1) matrix is trivially cheap. Do not get
- * clever here -- banded or affine-gap variants buy nothing and cost debugging time.
+ * clever here, banded or affine-gap variants buy nothing and cost debugging time.
  */
 
 export const MATCH = 2
@@ -23,12 +23,12 @@ export const GAP = -1
  * @param {string[]} hyp
  * @returns {AlignOp[]} operations in reference order
  */
-// A 100-word passage against a 100-word transcript is a 10k-cell matrix -- free. A pasted
+// A 100-word passage against a 100-word transcript is a 10k-cell matrix, free. A pasted
 // chapter against a Whisper repetition loop is not: the DP matrix is O(m*n) Int32 cells, so
 // 12000x12000 is ~576MB and takes the tab down with it.
 //
 // 1200 caps the matrix at ~5.8MB. Nothing legitimate here comes close: ORF passages run 60-250
-// words and the norms are built on one-minute reads. Truncating is the right failure -- an
+// words and the norms are built on one-minute reads. Truncating is the right failure. An
 // input this size is already not a reading assessment.
 export const MAX_TOKENS = 1200
 
@@ -51,7 +51,7 @@ export function align(ref, hyp) {
   }
 
   // Backtrace. Diagonal wins ties, which biases toward calling a deviation a substitution
-  // rather than an omission+insertion pair -- that is how a human marks a running record.
+  // rather than an omission+insertion pair. That is how a human marks a running record.
   const ops = []
   let i = m
   let j = n

@@ -13,14 +13,14 @@ import { StudentResult } from './components/StudentResult.jsx'
 import { UnscoreableRead } from './components/UnscoreableRead.jsx'
 
 /**
- * ReadAloud — browser-only oral reading fluency assessment.
+ * ReadAloud, browser-only oral reading fluency assessment.
  *
  * Four steps and a printable report. All state is here and it is plain `useState`: the whole
  * app is one student, one passage, one recording and one set of teacher overrides, and any
  * amount of state-management machinery on top of that would be ceremony.
  *
  * ---------------------------------------------------------------------------------------
- * DEMO MODE — Ctrl+Shift+D
+ * DEMO MODE, Ctrl+Shift+D
  * ---------------------------------------------------------------------------------------
  * Loads `public/demo/clean-read.wav` and pushes it through the *real* pipeline: decode to
  * 16kHz mono, Whisper in the worker, the same scorer, the same screens. The only thing
@@ -33,7 +33,7 @@ import { UnscoreableRead } from './components/UnscoreableRead.jsx'
  * from the product the way a canned screenshot would.
  *
  * The hotkey also swaps in DEMO_PASSAGE, because the bundled recording is a reading of that
- * specific text — pointing it at a passage the audio does not match would produce a wall of
+ * specific text, pointing it at a passage the audio does not match would produce a wall of
  * false omissions. Results scored this way are labelled as a demo on screen and on the printed
  * report; the tool never lets a bundled recording pass as a child's read.
  * ---------------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ export default function App() {
   const [demoToken, setDemoToken] = useState(null)
 
   // Teacher overrides. Two maps, because score() addresses overrides by reference index and
-  // insertions have no reference index -- see applyInsertionOverrides below.
+  // insertions have no reference index, see applyInsertionOverrides below.
   const [overrides, setOverrides] = useState({})
   const [insertionOverrides, setInsertionOverrides] = useState(() => new Set())
   // The other direction: words the engine forgave and the teacher wants counted. Keeping the
@@ -103,7 +103,7 @@ export default function App() {
 
   /**
    * Insertions cannot be overridden through score(). `options.overrides` is keyed by reference
-   * index, and an insertion is a word that is not in the passage -- refIndex is null, so there
+   * index, and an insertion is a word that is not in the passage, refIndex is null, so there
    * is no key to use. Rather than reach into the tested engine to change that contract, the UI
    * applies those overrides itself and recomputes with the engine's own `computeMetrics`.
    *
@@ -186,7 +186,7 @@ export default function App() {
   const headerStep = step === 'report' ? 'results' : step
 
   // The engine refuses to vouch for silence or a two-word transcript. When it does, no score,
-  // no percentile and no printable report are produced from it -- see UnscoreableRead.
+  // no percentile and no printable report are produced from it, see UnscoreableRead.
   const unscoreable = scored?.validity && scored.validity.ok === false ? scored.validity : null
   const showResults = step === 'results' && student && passage && read && metrics
   const showReport = step === 'report' && student && passage && read && metrics && !unscoreable

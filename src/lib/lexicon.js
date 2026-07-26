@@ -1,5 +1,5 @@
 /**
- * High-frequency English words -- roughly the Dolch and Fry lists, plus the short nouns and
+ * High-frequency English words, roughly the Dolch and Fry lists, plus the short nouns and
  * function words that form minimal pairs.
  *
  * THIS LIST EXISTS TO STOP SUPPRESSION, NOT TO ENABLE IT.
@@ -7,7 +7,7 @@
  * Both the dialect rules and the phonetic (Soundex) filter are lossy enough to bridge real
  * minimal pairs: `thing`/`thin`, `sing`/`sin`, `bad`/`bat`, `bed`/`bet`, `her`/`he`,
  * `your`/`you`, `sad`/`sat`. Every one of those is a plain decoding error, and both filters
- * were erasing them from the report -- silently, which is the worst way for an assessment tool
+ * were erasing them from the report, silently, which is the worst way for an assessment tool
  * to be wrong. A teacher would never learn that the child read "he" for "her".
  *
  * The guard: if BOTH words are ordinary English, no approximate filter may bridge them. A child
@@ -15,7 +15,7 @@
  * record captures, and no pronunciation-variant or phonetic-similarity argument outweighs it.
  *
  * This costs nothing on the true positives, because the variant side of a genuine dialect pair
- * is never itself a standard word -- "dis", "col", "fo", "aks", "runnin", "wif", "sista" are
+ * is never itself a standard word, "dis", "col", "fo", "aks", "runnin", "wif", "sista" are
  * all absent from this list by construction.
  */
 export const COMMON_WORDS = new Set(
@@ -59,7 +59,7 @@ const INFLECTIONS = ['s', 'es', 'ed', 'd', 'ing', 'er', 'est', 'ly', 'y']
  *
  * `bothCommon` has a hole it cannot close by growing: it is a membership test, and no word list
  * contains every inflected form. Measured against this project's own eval passages, 100% of
- * inflected forms and 59% of the passage vocabulary are absent from COMMON_WORDS -- so the
+ * inflected forms and 59% of the passage vocabulary are absent from COMMON_WORDS. So the
  * Soundex filter was still forgiving real substitutions on the very text we score:
  *
  *     showed -> said     scored 100% correct

@@ -34,7 +34,7 @@ export const PER_DEVICE_CONFIG = {
 /**
  * Generation options.
  *
- * NO `language` and NO `task`. See above -- adding either one breaks the entire product.
+ * NO `language` and NO `task`. See above. Adding either one breaks the entire product.
  * `stride_length_s` is also deliberately absent: it defaults to chunk_length_s / 6 = 5, and
  * passing both risks the `chunk_length_s > stride_length_s` throw for no benefit.
  */
@@ -66,7 +66,7 @@ export function toAsrResult(out, durationSec) {
     return { text, words, durationSec }
   }
 
-  // No chunks -- either timestamps were off or the ONNX export lacks alignment heads.
+  // No chunks. Either timestamps were off or the ONNX export lacks alignment heads.
   // Callers interpolate from durationSec. ADR-4: this costs polish, not product.
   return {
     text,

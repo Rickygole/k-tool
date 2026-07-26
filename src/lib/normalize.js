@@ -1,7 +1,7 @@
 /**
  * Text normalisation, applied identically to reference and hypothesis before alignment.
  *
- * The one asymmetry is disfluency removal, which runs on the hypothesis only -- "um" in the
+ * The one asymmetry is disfluency removal, which runs on the hypothesis only. "um" in the
  * passage is a word the child is supposed to read; "um" in the transcript is throat-clearing.
  */
 
@@ -119,7 +119,7 @@ export function ordinalToWords(n) {
 /**
  * Normalise a single token: lowercase, strip punctuation except intra-word apostrophes.
  *
- * Curly apostrophes are folded to straight ones first -- Whisper emits U+2019 and passages
+ * Curly apostrophes are folded to straight ones first. Whisper emits U+2019 and passages
  * typed in a word processor do too, so without this "don't" and "don’t" are different words.
  */
 export function normalizeToken(raw) {
@@ -128,7 +128,7 @@ export function normalizeToken(raw) {
     .replace(/[‘’ʼ]/g, "'")
     .replace(/[–—]/g, '-')
     // Fold diacritics rather than deleting them. Stripping non-ASCII turned "café" into "caf"
-    // and "piñata" into "piata" -- silently, so a passage containing an ordinary loanword (both
+    // and "piñata" into "piata", silently, so a passage containing an ordinary loanword (both
     // are common in elementary readers) would mis-score with no warning to the teacher.
     // NFD splits the base letter from its accent; the range strips only the accent.
     .normalize('NFD')
@@ -142,7 +142,7 @@ export function normalizeToken(raw) {
 /**
  * Tokenise text into aligned original/normalized pairs.
  *
- * The `original` array is what the UI renders -- real capitalisation, real punctuation. The
+ * The `original` array is what the UI renders. Real capitalisation, real punctuation. The
  * `normalized` array is what the aligner sees. They stay index-parallel so a scored token can
  * always be traced back to the exact word on screen.
  *
@@ -153,7 +153,7 @@ export function normalizeToken(raw) {
 /**
  * Whisper's trailing hallucinations, stripped from the END of a transcript.
  *
- * On trailing silence Whisper emits phrases from its training distribution -- it was trained on
+ * On trailing silence Whisper emits phrases from its training distribution. It was trained on
  * a great deal of YouTube, and the outro is the most predictable thing in that corpus. A child
  * who finishes reading and sits quietly for three seconds reliably produces one of these.
  *
@@ -207,7 +207,7 @@ export function tokenize(text, opts = {}) {
   const expanded = expandNumbers(src)
 
   // Hyphens separate words for reading purposes. A child reading "sixty-five" says two words,
-  // and Whisper writes two words -- so without this split every hyphenated compound in the
+  // and Whisper writes two words. So without this split every hyphenated compound in the
   // passage scores as a substitution plus an insertion.
   const raw = expanded.split(/[\s–—-]+/).filter(Boolean)
 
@@ -222,7 +222,7 @@ export function tokenize(text, opts = {}) {
     // Contractions expand into their component words on BOTH sides, so "doesn't" and
     // "does not" align naturally instead of colliding as a 1-token vs 2-token mismatch.
     // The display array repeats the source token across the expansion, which keeps
-    // original[] and normalized[] index-parallel -- the UI still renders "doesn't".
+    // original[] and normalized[] index-parallel. The UI still renders "doesn't".
     const expansion = CONTRACTIONS[norm]
     if (expansion) {
       for (const part of expansion.split(' ')) {

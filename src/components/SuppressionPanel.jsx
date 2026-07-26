@@ -6,7 +6,7 @@ const ORDER = ['dialect', 'homophone', 'fuzzy', 'phonetic', 'contraction']
  * What we chose not to count, and why.
  *
  * This panel is the product's argument, written out. A reading assessor that only reports
- * errors is making an implicit claim that every deviation it found was a reading failure — and
+ * errors is making an implicit claim that every deviation it found was a reading failure. And
  * for a child who speaks African American English, or for any child a recogniser mishears, that
  * claim is often false. Miscue analysis has scored dialect features as errors for decades, and
  * ASR compounds it: Koenecke et al. (PNAS 2020) measured roughly double the word error rate for

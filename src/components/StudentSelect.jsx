@@ -12,7 +12,7 @@ import {
  * Three levels of drill-down: school level -> grade -> student.
  *
  * The drill-down state lives HERE, not in App. App's step machine stays at five steps on
- * purpose -- every extra step is another place a live demo can get stranded with no way back,
+ * purpose. Every extra step is another place a live demo can get stranded with no way back,
  * and "which grade am I looking at" is a detail of choosing a student, not a stage of the
  * assessment. The breadcrumb provides back-navigation without the router ever knowing.
  *
@@ -20,7 +20,7 @@ import {
  * was wrong twice over: it fired before a passage had even been chosen, so there was nothing the
  * teacher could act on, and it looked like an alarm about a problem that did not exist yet. The
  * caveat belongs beside the percentile on the results screen, where somebody is actually reading
- * the number -- see the out-of-level note in MetricCards.
+ * the number, see the out-of-level note in MetricCards.
  */
 export function StudentSelect({ selectedId, onSelect }) {
   const [levelKey, setLevelKey] = useState(null)

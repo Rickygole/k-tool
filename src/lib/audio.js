@@ -29,7 +29,7 @@ export async function decodeTo16kMono(source) {
       )
     }
 
-    // Mono. If the source is stereo we take channel 0 rather than mixing -- the capture path
+    // Mono. If the source is stereo we take channel 0 rather than mixing. The capture path
     // requests channelCount: 1 anyway, so a second channel here means a file, not a mic.
     return {
       audio: decoded.getChannelData(0),
@@ -71,7 +71,7 @@ export function createRecorder() {
   return {
     async start() {
       // Reentrancy guard. A double-click on Record used to leak the previous MediaStream --
-      // leaving the browser's mic indicator lit, which is very visible on a projector -- and
+      // leaving the browser's mic indicator lit, which is very visible on a projector. And
       // the previous meter AudioContext, and Chrome caps AudioContexts per page, so a few
       // repeated reads in one session would stop the recorder working at all.
       if (recorder) return
@@ -86,7 +86,7 @@ export function createRecorder() {
       })
 
       // Live input level, so the reader can see the mic is alive. A dead mic during a judge
-      // demo is a slow, silent catastrophe -- this is the cheapest possible insurance.
+      // demo is a slow, silent catastrophe. This is the cheapest possible insurance.
       meterCtx = new AudioContext()
       analyser = meterCtx.createAnalyser()
       analyser.fftSize = 512
@@ -111,7 +111,7 @@ export function createRecorder() {
         const v = (buf[i] - 128) / 128
         sum += v * v
       }
-      // sqrt of mean square, then a gentle boost -- speech RMS sits low and an honest meter
+      // sqrt of mean square, then a gentle boost. Speech RMS sits low and an honest meter
       // looks broken.
       return Math.min(1, Math.sqrt(sum / buf.length) * 3)
     },
@@ -119,7 +119,7 @@ export function createRecorder() {
     async stop() {
       // Returns null rather than throwing on a second call. MediaRecorder.stop() on an
       // already-inactive recorder raises InvalidStateError, and a double-tapped stop button is
-      // an ordinary thing for a person to do -- it should not surface as an exception the UI
+      // an ordinary thing for a person to do. It should not surface as an exception the UI
       // has to catch.
       if (!recorder) return null
 

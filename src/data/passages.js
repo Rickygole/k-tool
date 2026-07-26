@@ -1,5 +1,5 @@
 /**
- * Assessment passages. All five are original text written for this project -- nothing is
+ * Assessment passages. All five are original text written for this project. Nothing is
  * lifted from a published reading program, because those are copyrighted and because a
  * benchmark passage that has already been taught is not a benchmark.
  *
@@ -10,14 +10,14 @@
  *   - No digits. `normalize.expandNumbers` rewrites "5" to "five" before tokenising, so a
  *     numeral in the source would render in the marked-up passage as its spelled-out form and
  *     no longer match the printed page. Spell numbers out here instead.
- *   - No hyphenated compounds. `normalize.tokenize` splits on hyphens (correctly -- a reader
+ *   - No hyphenated compounds. `normalize.tokenize` splits on hyphens (correctly. A reader
  *     says two words), which would drop the hyphen from the marked-up rendering.
  *   - One paragraph. The scorer returns a flat token list, so the marked-up passage reflows as
  *     a single block; a paragraph break in the source would silently disappear on the results
  *     screen.
  *
  * Contractions ARE used deliberately. They expand to two tokens internally ("isn't" -> "is
- * not") and the results view has to regroup them back into one printed word -- so keeping one
+ * not") and the results view has to regroup them back into one printed word. So keeping one
  * in the set means that path is exercised every time anyone reads passage three.
  *
  * Grade levels are the author's judgement against typical sentence length and vocabulary, not
@@ -110,7 +110,7 @@ export const PASSAGES = [
  * `public/demo/clean-read.wav` is a bundled recording of exactly this text, and demo mode
  * (Ctrl+Shift+D) runs that file through the real decode -> Whisper -> score pipeline. The
  * passage has to match the recording or the demo produces a wall of omissions, so this text
- * and that wav file are a matched pair -- change one and you must re-record the other.
+ * and that wav file are a matched pair, change one and you must re-record the other.
  *
  * It is 40 words rather than ~100 because the recording is eleven seconds long. Demo mode is
  * insurance against a dead microphone in a noisy room, not a substitute for a real assessment,

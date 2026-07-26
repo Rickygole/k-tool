@@ -6,7 +6,7 @@ import { STATUS_GLYPH } from '../util/markup.js'
  * The override button is the most important control in the product, and it is one click for a
  * reason. An ASR-based scorer is a stopwatch with opinions; the teacher is the assessor. When
  * the machine calls "sun" for "son" an error and the teacher heard otherwise, the fix has to be
- * cheaper than arguing with it — so "Not an error" is a single click, it is reversible, and
+ * cheaper than arguing with it. So "Not an error" is a single click, it is reversible, and
  * every metric on the screen recomputes from it immediately.
  *
  * Errors and non-errors are two tables rather than one with a type column. Self-corrections and

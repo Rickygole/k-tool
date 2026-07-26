@@ -7,7 +7,7 @@ import { percentileCopy } from './MetricCards.jsx'
  * Step 5. The one-pager that goes in the folder.
  *
  * This is the artifact that outlives the software. It gets printed, stapled to a running record
- * folder, handed to a parent at a conference, or filed for an IEP meeting — so it is designed
+ * folder, handed to a parent at a conference, or filed for an IEP meeting. So it is designed
  * for paper first and a screen second.
  *
  * What that means concretely:
@@ -19,7 +19,7 @@ import { percentileCopy } from './MetricCards.jsx'
  *   - There is a notes line. A teacher will write on this the moment it comes off the printer,
  *     and leaving them nowhere to do it is how a form gets ignored.
  *   - Every suppression is disclosed on the page, not just on screen. If the score was adjusted,
- *     the paper says so and says why — a parent reading this deserves the same explanation the
+ *     the paper says so and says why. A parent reading this deserves the same explanation the
  *     teacher got.
  */
 export function TeacherReport({ student, passage, read, tokens, metrics, season, onBack }) {

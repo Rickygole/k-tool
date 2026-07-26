@@ -76,7 +76,7 @@ describe('score() — the ten cases', () => {
   })
 
   it('7. substitution suppressed by fuzzy match', () => {
-    // At the 0.9 threshold the filter only forgives long words with a single edit -- which is
+    // At the 0.9 threshold the filter only forgives long words with a single edit. Which is
     // what ASR spelling variance actually looks like. "littles" for "little" is 0.857 and is
     // now correctly scored as an error: a child who added a plural read the word wrong.
     const r = score('the restaurant opened', asr('the restaurent opened'))
@@ -112,7 +112,7 @@ describe('score() — the ten cases', () => {
     expect(rules['g-dropping']).toBeGreaterThanOrEqual(1)
     expect(rules['metathesis']).toBeGreaterThanOrEqual(1)
 
-    // Every suppression is explainable — never a silent pass.
+    // Every suppression is explainable, never a silent pass.
     for (const t of r.tokens.filter((x) => x.suppressedBy === 'dialect')) {
       expect(t.dialectRules.length).toBeGreaterThan(0)
       expect(t.confidence).toBe('low')
@@ -277,7 +277,7 @@ describe('hardening — findings from the review gate', () => {
   })
 
   it('refuses to score a silent recording instead of inventing a report', () => {
-    // A dead mic returns silence, and silence aligns as "every word omitted" -- which rendered
+    // A dead mic returns silence, and silence aligns as "every word omitted". Which rendered
     // a confident, printable running record for a child who never spoke.
     const silent = score(PASSAGE, { text: '', words: [], durationSec: 60 })
     expect(silent.validity.ok).toBe(false)
@@ -296,7 +296,7 @@ describe('hardening — findings from the review gate', () => {
 
   it('cannot report a physically impossible WCPM', () => {
     // A double-tapped stop button reported 600,000 WCPM at the 90th percentile. Now the read is
-    // refused outright and carries no verdict at all -- null, not a smaller wrong number.
+    // refused outright and carries no verdict at all, null, not a smaller wrong number.
     for (const d of [0.001, 0.5, 1.9, 0]) {
       const m = score(PASSAGE, asr(PASSAGE, d)).metrics
       expect(m.scoreable).toBe(false)
@@ -343,7 +343,7 @@ describe('hardening — findings from the review gate', () => {
   })
 
   it('folds diacritics instead of deleting them', () => {
-    // "café" was becoming "caf" and "piñata" "piata" -- silently mis-scoring loanwords that
+    // "café" was becoming "caf" and "piñata" "piata", silently mis-scoring loanwords that
     // appear routinely in elementary readers.
     const r = score('we ate at the café near the piñata', asr('we ate at the cafe near the pinata'))
     expect(r.metrics.errors).toBe(0)
@@ -365,7 +365,7 @@ describe('hardening — findings from the review gate', () => {
 
 describe('the phonetic filter no longer erases real substitutions', () => {
   // Soundex ignores vowels and most suffixes, so it was bridging pairs that are plainly
-  // different words. Two of these are PLANTED substitutions in our own eval fixtures -- the
+  // different words. Two of these are PLANTED substitutions in our own eval fixtures. The
   // filter was lowering our substitution recall while appearing to help.
   const mustFlag = [
     ['showed', 'said', 'comprehension-breaking substitution'],

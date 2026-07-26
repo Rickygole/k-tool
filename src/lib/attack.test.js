@@ -1,5 +1,5 @@
 /**
- * ADVERSARIAL SUITE — assertions a correct oral-reading-fluency assessor MUST satisfy.
+ * ADVERSARIAL SUITE, assertions a correct oral-reading-fluency assessor MUST satisfy.
  *
  * Unlike score.test.js, nothing here is written to pass. Each `it` states a property the
  * product claims (or implicitly promises) and tries to falsify it. A RED test here is an
@@ -161,7 +161,7 @@ describe('D. WCPM must be computed the way Hasbrouck & Tindal 2017 computed it',
   })
 
   it('a contraction is ONE word to a human scorer and must count as one', () => {
-    // `normalized` is the ALIGNMENT view -- contractions expand there on purpose so "doesn't"
+    // `normalized` is the ALIGNMENT view, contractions expand there on purpose so "doesn't"
     // can match "does not". `runningWords` is the SCORING view, counted as a teacher counts.
     expect(tokenize("she doesn't know it isn't there").runningWords).toBe(6)
   })

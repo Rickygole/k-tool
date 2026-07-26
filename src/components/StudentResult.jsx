@@ -12,7 +12,7 @@ import { PassageMarkup, MarkupLegend } from './PassageMarkup.jsx'
  * is the subject of the plan, never its owner."
  *
  * This is a RENDERING, not a mode. Same read, same tokens, same numbers, one toggle away from
- * the teacher's view. It computes nothing, stores nothing, and can change nothing — everything
+ * the teacher's view. It computes nothing, stores nothing, and can change nothing, everything
  * here is derived from props the teacher's screen already received. That is deliberate: a
  * second scoring path would be a second thing that can disagree with the first.
  *
@@ -21,8 +21,8 @@ import { PassageMarkup, MarkupLegend } from './PassageMarkup.jsx'
  * ------------------------------------------------------------------------------------------
  * No percentile band. No instructional level. No "frustration."
  *
- * Those are adult constructs for adult decisions. `MetricCards` renders "Frustration — below 90%
- * accuracy — this text is too hard unsupported" and "Below 10th", and putting either in front of
+ * Those are adult constructs for adult decisions. `MetricCards` renders "Frustration, below 90%
+ * accuracy. This text is too hard unsupported" and "Below 10th", and putting either in front of
  * a seven-year-old is not child-appropriate language, it is a child-appropriate font wrapped
  * around an adult verdict. A child told they are below the tenth percentile learns something
  * about their identity, not about their reading.
@@ -31,8 +31,8 @@ import { PassageMarkup, MarkupLegend } from './PassageMarkup.jsx'
  * thing to practise. That is the whole screen.
  */
 export function StudentResult({ student, tokens, metrics, onBack }) {
-  // Same two-part gate the teacher's route uses. `metrics` is never null -- withVerdictGuard
-  // returns an object with the judgement fields nulled -- so checking `metrics` alone is not
+  // Same two-part gate the teacher's route uses. `metrics` is never null, withVerdictGuard
+  // returns an object with the judgement fields nulled. So checking `metrics` alone is not
   // enough, and a naive render would print "You read null words!" to a child.
   if (!metrics || metrics.scoreable === false) {
     return (

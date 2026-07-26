@@ -1,8 +1,8 @@
 /**
  * Evaluation harness.
  *
- * For each passage it renders two clips -- one read cleanly, one read with a scripted set of
- * miscues -- transcribes both with the real pipeline, scores them, and compares the scorer's
+ * For each passage it renders two clips. One read cleanly, one read with a scripted set of
+ * miscues, transcribes both with the real pipeline, scores them, and compares the scorer's
  * output against ground truth that was constructed rather than annotated.
  *
  * The number that matters most is the FALSE POSITIVE RATE ON CLEAN READS. Telling a child who
@@ -12,7 +12,7 @@
  * HONEST LIMITATION, stated up front and repeated in EVAL.md: the clips are macOS `say` speech
  * synthesis, not children reading. This measures the alignment and classification layer end to
  * end against a real recogniser, which is the part we built. It does NOT measure how well
- * Whisper handles a seven-year-old's voice -- that needs human recordings and is the honest
+ * Whisper handles a seven-year-old's voice. That needs human recordings and is the honest
  * next step, not something a weekend can settle.
  *
  *   node eval/runEval.mjs [--skip-audio]
@@ -34,7 +34,7 @@ mkdirSync(AUDIO_DIR, { recursive: true })
  * Render text to a 16kHz mono WAV via macOS `say`. Deterministic, so reruns are comparable.
  *
  * The 500ms of leading silence is not cosmetic. Whisper truncates speech onset when audio
- * begins at t=0 -- on the unpadded demo clip it swallowed the word "The" and the scorer
+ * begins at t=0. On the unpadded demo clip it swallowed the word "The" and the scorer
  * correctly reported an omission that the reader never made. That is an audio capture
  * artifact, not a reading event, and padding is the honest fix. The live recorder gets the
  * same treatment for the same reason.
@@ -102,7 +102,7 @@ async function transcribe(audio, durationSec) {
 //
 // A detection counts as a true positive if the scorer flagged the SAME reference index with
 // the SAME miscue kind. Matching on index and not merely on totals is what makes this an
-// evaluation rather than a tally -- a scorer that finds ten errors in the wrong ten places
+// evaluation rather than a tally. A scorer that finds ten errors in the wrong ten places
 // should not score well.
 // ---------------------------------------------------------------------------------------
 const KINDS = ['substitution', 'omission', 'insertion', 'self_correction']

@@ -2,7 +2,7 @@
  * ASR worker. Runs the whisper pipeline off the main thread so the UI stays alive
  * (and the input meter keeps animating) while a 60s clip transcribes.
  *
- * Protocol -- main thread posts:
+ * Protocol, main thread posts:
  *   { type: 'load',       device?: 'wasm'|'webgpu', modelId?: string }
  *   { type: 'transcribe', audio: Float32Array (16kHz mono), durationSec, returnTimestamps? }
  * Worker posts back:
@@ -12,7 +12,7 @@
  *   { type: 'error',    message, stage }
  *
  * Every option this file uses comes from asrOptions.js, shared with the smoke test and the
- * eval harness. Do not inline options here -- that divergence is what let a fatal bug sit
+ * eval harness. Do not inline options here. That divergence is what let a fatal bug sit
  * behind a green test suite.
  */
 import { pipeline, env } from '@huggingface/transformers'
@@ -24,7 +24,7 @@ import { MODEL_ID, PER_DEVICE_CONFIG, transcribeOptions, toAsrResult } from './a
 //
 // These live under src/ (copied there by scripts/vendor-ort.mjs on predev/prebuild) rather
 // than being imported from node_modules or served from public/. Both of those were tried and
-// both fail -- see the header of scripts/vendor-ort.mjs for exactly how.
+// both fail, see the header of scripts/vendor-ort.mjs for exactly how.
 import ortWasmUrl from '../vendor/ort-wasm-simd-threaded.jsep.wasm?url'
 import ortMjsUrl from '../vendor/ort-wasm-simd-threaded.jsep.mjs?url'
 

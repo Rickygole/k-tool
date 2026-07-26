@@ -9,7 +9,7 @@ const SEVERITY_CLASS = {
 }
 
 /**
- * The marked-up passage — the running record, rendered.
+ * The marked-up passage. The running record, rendered.
  *
  * Three commitments here, in order of how much they matter:
  *
@@ -21,7 +21,7 @@ const SEVERITY_CLASS = {
  *
  * 2. AMBER IS EXPLAINED, ALWAYS. A word we declined to count as an error is a claim about the
  *    reader, and a claim with no reason attached is just a colour. Hover or tab to any marked
- *    word and it says what was heard and why we let it through — including which dialect rule
+ *    word and it says what was heard and why we let it through, including which dialect rule
  *    fired, by name.
  *
  * 3. THE MARKING IS REACHABLE BY KEYBOARD. Marked words are focusable and carry the same text

@@ -1,5 +1,5 @@
 /**
- * Mock roster. There is no database and no auth in this build -- both are explicit non-goals.
+ * Mock roster. There is no database and no auth in this build. Both are explicit non-goals.
  * A real deployment would read this from a roster sync (Clever, ClassLink, OneRoster); the
  * shape below is deliberately the subset such a sync would provide.
  *
@@ -14,12 +14,12 @@
  *
  * `hasOrfNorms` is the important field here and it is not cosmetic. Hasbrouck & Tindal 2017
  * publishes oral reading fluency norms for grades 1-6 ONLY, because ORF stops discriminating
- * usefully once decoding is fluent -- by middle school a struggling reader's difficulty is
+ * usefully once decoding is fluent, by middle school a struggling reader's difficulty is
  * usually comprehension or vocabulary rather than word recognition, and words-per-minute no
  * longer measures it.
  *
  * A middle or high school student still gets a real WCPM, a real accuracy figure, and a
- * percentile -- but that percentile is computed from the PASSAGE's grade, which is how score()
+ * percentile. But that percentile is computed from the PASSAGE's grade, which is how score()
  * is called (`grade: passage.grade`). Since every passage here is grade 2-4, the band always
  * resolves; what does not exist is any comparison against the student's own year group.
  *
@@ -160,7 +160,7 @@ export function studentsInGrade(grade) {
   return STUDENTS.filter((s) => s.grade === grade).sort((a, b) => a.name.localeCompare(b.name))
 }
 
-/** How many students each grade holds -- shown on the grade cards so empty grades are visible. */
+/** How many students each grade holds, shown on the grade cards so empty grades are visible. */
 export function gradeCounts(levelKey) {
   const level = SCHOOL_LEVELS.find((l) => l.key === levelKey)
   if (!level) return []

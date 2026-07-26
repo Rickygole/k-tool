@@ -85,14 +85,14 @@ function handleMessage(msg) {
     }
 
     case 'error': {
-      // WebGPU is the fast path and also the flaky one -- driver blocklists, Linux, older
+      // WebGPU is the fast path and also the flaky one, driver blocklists, Linux, older
       // Chrome. One silent retry on WASM is the difference between a slower demo and no demo.
       if (msg.stage === 'load' && snapshot.device === 'webgpu' && !triedWasmFallback) {
         triedWasmFallback = true
         console.warn(`[asr] WebGPU load failed (${msg.message}); falling back to WASM.`)
         // `error: null` matters. Without it the WebGPU message stays in the snapshot, and the
         // banner keeps reading "Speech model failed to load" for the whole WASM load and beyond
-        // -- reporting a failure to the teacher while the fallback is quietly succeeding.
+        //, reporting a failure to the teacher while the fallback is quietly succeeding.
         publish({ status: 'loading', device: 'wasm', progress: {}, error: null })
         worker.postMessage({ type: 'load', device: 'wasm' })
         return
@@ -115,7 +115,7 @@ function handleMessage(msg) {
   }
 }
 
-/** Start loading the model. Idempotent -- safe to call from every mount. */
+/** Start loading the model. Idempotent, safe to call from every mount. */
 export function startModelLoad() {
   if (worker) return
 
@@ -137,12 +137,12 @@ export function startModelLoad() {
   // opposite.
   //
   // Measured on transformers.js v3 with this model, 60s of audio on an M2: WASM 4.9-5.9s versus
-  // WebGPU 9.5-9.6s. WebGPU is roughly twice as SLOW here -- the v4 runtime rewrite is where it
+  // WebGPU 9.5-9.6s. WebGPU is roughly twice as SLOW here. The v4 runtime rewrite is where it
   // gets faster, and v4 has an open Whisper regression we are not shipping into. WebGPU also
   // carries a documented memory-leak history across repeated inferences, which is exactly what a
   // session of back-to-back reads does.
   //
-  // And `navigator.gpu` existing does not mean a GPU adapter can be acquired -- headless, VMs,
+  // And `navigator.gpu` existing does not mean a GPU adapter can be acquired, headless, VMs,
   // driver blocklists and locked-down school machines all expose the API and then fail at
   // adapter request, after which the fallback has to unwind a half-initialised backend. Starting
   // on the path that is both faster and more reliable removes that failure mode entirely.
@@ -163,7 +163,7 @@ export function whenModelReady() {
 }
 
 /**
- * Transcribe 16kHz mono audio. The buffer is transferred, not copied -- do not touch the
+ * Transcribe 16kHz mono audio. The buffer is transferred, not copied, do not touch the
  * Float32Array after calling this, it is detached.
  *
  * `durationSec` is passed through the worker and echoed back on the result rather than being
@@ -191,7 +191,7 @@ export function useAsrState() {
 /**
  * Overall download percentage across every file the pipeline is fetching.
  *
- * Averaging the per-file percentages would be a lie -- the tokenizer JSON is a few KB and the
+ * Averaging the per-file percentages would be a lie. The tokenizer JSON is a few KB and the
  * decoder weights are tens of MB, and weighting them equally makes the bar sprint to 50% and
  * then stop dead. Weight by bytes.
  */

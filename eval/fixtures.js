@@ -3,7 +3,7 @@
  *
  * Ground truth is CONSTRUCTED, not annotated. Each passage carries an explicit error script,
  * and the "as read" text is generated from the reference by applying that script. This means
- * we know with certainty what the correct answer is -- there is no human labelling step to
+ * we know with certainty what the correct answer is. There is no human labelling step to
  * disagree about, and no chance of scoring our own homework.
  *
  * Edit kinds:
@@ -135,7 +135,7 @@ export const PASSAGES = [
  * the ground-truth miscue list keyed by reference index.
  *
  * Reference indices are computed on a whitespace split of the raw text, which matches how
- * `tokenize()` indexes it once punctuation is stripped -- verified by the harness, which
+ * `tokenize()` indexes it once punctuation is stripped, verified by the harness, which
  * asserts the two agree before it trusts any number it prints.
  */
 export function applyErrorScript(text, errorScript) {

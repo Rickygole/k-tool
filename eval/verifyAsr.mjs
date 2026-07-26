@@ -1,10 +1,10 @@
 /**
  * Gate 1, Node edition. Proves the whisper pipeline loads, downloads, and produces
- * word timestamps -- without needing a browser in the loop.
+ * word timestamps. Without needing a browser in the loop.
  *
  * The browser and Node paths share the same transformers.js pipeline and the same ONNX
  * weights, so this verifies the model repo, the option shape, and the output shape. It does
- * NOT verify getUserMedia, AudioContext resampling, or the IndexedDB cache -- those are
+ * NOT verify getUserMedia, AudioContext resampling, or the IndexedDB cache. Those are
  * browser-only and get checked separately.
  *
  *   node eval/verifyAsr.mjs [path/to/audio.wav]

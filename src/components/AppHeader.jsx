@@ -11,7 +11,7 @@ const STEPS = [
 /**
  * The one persistent chrome in the app: identity, where you are, and the reading supports.
  *
- * The h1 lives here and only here. Screens use h2. That is not pedantry -- a screen reader
+ * The h1 lives here and only here. Screens use h2. That is not pedantry. A screen reader
  * user navigating by heading needs the document outline to describe the app, and an h1 per
  * screen would tell them they had landed on four different websites.
  */

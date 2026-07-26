@@ -13,7 +13,7 @@ import { bothCommon } from './lexicon.js'
  *
  * ============================ READ THIS BEFORE TRUSTING IT ============================
  * These rules are phonological. They run on Whisper's *text*, and Whisper is trained to emit
- * standard orthography -- it will usually transcribe "aks" as "ask", "walkin'" as "walking",
+ * standard orthography. It will usually transcribe "aks" as "ask", "walkin'" as "walking",
  * "dis" as "this". So many of these rules will simply never fire, and a rule that never fires
  * is not a feature. `eval/` reports per-rule firing counts precisely so this claim stays
  * honest. Do not describe this layer as doing work until those counts say it does.
@@ -85,7 +85,7 @@ export const RULES = [
     id: 'th-fronting',
     label: 'Th-fronting',
     example: '"with" → "wif", "bath" → "baf"',
-    // Medial and final only -- deliberately NOT initial, which is the stopping environment.
+    // Medial and final only, deliberately NOT initial, which is the stopping environment.
     //
     // Both voicings are modelled. Voiceless /th/ fronts to [f] ("bath" -> "baf"); voiced /th/
     // fronts to [v] ("brother" -> "brovah"), and omitting the [v] half meant the single most
@@ -102,7 +102,7 @@ export const RULES = [
     // THIS RULE WAS REWRITTEN AFTER IT FAILED BADLY. Read this before "simplifying" it.
     //
     // The original canon dropped postvocalic r, then collapsed vowel runs, then neutralised the
-    // final vowel to a schwa -- a chain lossy enough that `house` and `horse` both became
+    // final vowel to a schwa. A chain lossy enough that `house` and `horse` both became
     // `hosa`. The tool told a teacher that a child who read "horse" for "house" had produced a
     // pronunciation variant and needed no attention. A pair guard on r-count did not save it,
     // because `house`/`horse` genuinely differ in r-count. That is the failure mode this whole
@@ -147,11 +147,11 @@ export const RULES = [
     label: '-ing reduction',
     example: '"running" → "runnin"',
     // Labelled honestly: g-dropping is near-universal in casual English across every variety.
-    // It is NOT an AAE-specific feature and must not be presented as one -- a linguistically
+    // It is NOT an AAE-specific feature and must not be presented as one. A linguistically
     // literate judge will catch that, and rightly.
     //
     // GUARD: only fires where -ing is a SUFFIX. In "thing", "sing", "king", "ring" the letters
-    // are part of the root, and reducing them produces "thin", "sin", "kin" -- all real words,
+    // are part of the root, and reducing them produces "thin", "sin", "kin". All real words,
     // so the rule was quietly forgiving four genuine decoding errors a first-grade teacher
     // very much wants to see.
     guard: (refWord) => !MONOMORPHEMIC_ING.has(refWord),
@@ -161,7 +161,7 @@ export const RULES = [
     id: 'metathesis',
     label: 'Metathesis (ask/aks)',
     example: '"ask" → "aks"',
-    // NOT "regularised past tense" -- that label is simply wrong. /aks/ is transposition of
+    // NOT "regularised past tense". That label is simply wrong. /aks/ is transposition of
     // /s/ and /k/, a lexical variant descending from Old English ācsian. It appears in
     // inflected forms ("asked" → "aksed") but the process has nothing to do with tense.
     canon: (w) => w.replace(/^aks/, 'ask'),
@@ -202,7 +202,7 @@ export function dialectMatch(refWord, hypWord) {
   if (refWord === hypWord) return { matched: false, ruleIds: [] }
 
   // A substitution of one everyday word for another is a reading event, not a pronunciation
-  // variant. Without this the rules forgive `thing`/`thin`, `bad`/`bat`, `her`/`he` -- real
+  // variant. Without this the rules forgive `thing`/`thin`, `bad`/`bat`, `her`/`he`. Real
   // decoding errors, silently erased from the report. See COMMON_WORDS above.
   if (bothCommon(refWord, hypWord)) return { matched: false, ruleIds: [] }
 
@@ -224,7 +224,7 @@ export function dialectMatch(refWord, hypWord) {
   //     that pair by reading the rule list, which is the problem.
   //   - It could not report honestly. The stacked branch listed every rule that had touched
   //     either word, so a suppression would cite "final consonant devoicing" for a pair where
-  //     devoicing did no work -- a wrong explanation shown to a teacher.
+  //     devoicing did no work. A wrong explanation shown to a teacher.
   //
   // One rule, named, auditable. A pair that genuinely needs two features is a pair we decline
   // to forgive, and under-forgiving is the safe direction for an assessment tool.

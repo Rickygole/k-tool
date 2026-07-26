@@ -10,7 +10,7 @@
  * 146 in 2017 but 150 in 2006. Judges from a K-12 program know these numbers.
  *
  * Grade 1 has no fall administration in the source table. Reading Rockets' HTML rendering of
- * this table shifts the grade 1 row to compensate and is wrong as a result -- do not copy from
+ * this table shifts the grade 1 row to compensate and is wrong as a result, do not copy from
  * it. `null` below is that genuine absence, not a missing datum.
  */
 
@@ -34,7 +34,7 @@ export const CITATION =
  * Approximate percentile band for a WCPM score.
  *
  * Returns the highest published percentile the reader meets or exceeds, or 10 if they fall
- * below the 10th. Deliberately a band, not an interpolated point estimate -- a table with five
+ * below the 10th. Deliberately a band, not an interpolated point estimate. A table with five
  * rows cannot support a claim like "37th percentile", and pretending otherwise is the kind of
  * false precision that makes an assessment tool untrustworthy.
  *
@@ -43,7 +43,7 @@ export const CITATION =
 export function percentileBand(wcpm, grade, season = 'spring') {
   const row = ORF_NORMS[grade]
   const idx = SEASON_INDEX[season]
-  // null means "no published norms for this grade/season" -- H&T 2017 covers grades 1-6 only,
+  // null means "no published norms for this grade/season", H&T 2017 covers grades 1-6 only,
   // so grade 7+ and kindergarten legitimately have no answer and must not be given one.
   if (!row || idx === undefined || !Number.isFinite(wcpm)) return null
 
@@ -53,7 +53,7 @@ export function percentileBand(wcpm, grade, season = 'spring') {
   }
   // Below the published 10th percentile is NOT the 10th percentile. A grade-6 reader at 5 WCPM
   // against a 91 WCPM floor is off the bottom of the table, and reporting them as "10th
-  // percentile" overstates them enormously -- in the direction that lets a struggling reader go
+  // percentile" overstates them enormously, in the direction that lets a struggling reader go
   // unnoticed, which is the worst direction for this tool to be wrong in.
   //
   // 'below_10' is a distinct value rather than null, because null already means "this grade has
@@ -77,7 +77,7 @@ export function medianWcpm(grade, season = 'spring') {
  * just stay consistent with whatever the report prints.
  */
 export function instructionalLevel(accuracyPct) {
-  // NaN falls through every comparison, so a naive chain returns the LAST branch -- meaning a
+  // NaN falls through every comparison, so a naive chain returns the LAST branch, meaning a
   // missing accuracy silently reported "frustration", the most consequential label the tool
   // can attach to a child. Absent data must read as absent.
   if (!Number.isFinite(accuracyPct)) return null

@@ -17,7 +17,7 @@
  * is what the teacher sees, and the mapping between them is the whole argument of this product:
  *
  *   ok      green   read correctly, or the teacher overrode our call
- *   note    green   self-correction or repetition -- NOT errors under running-record
+ *   note    green   self-correction or repetition. NOT errors under running-record
  *                   convention, but worth marking, so they get a glyph and no colour change
  *   unsure  amber   we suppressed a mismatch, or we are not confident. The word may have been
  *                   read differently than printed and we are declining to call that an error.
@@ -141,7 +141,7 @@ export function buildUnits(tokens) {
 
     // Pull the rest of an expanded contraction back together. We only ever absorb tokens that
     // print identically and sit immediately adjacent, so a genuinely repeated word ("the the")
-    // is never merged, and an interrupted expansion just renders as two units -- ugly in a
+    // is never merged, and an interrupted expansion just renders as two units, ugly in a
     // rare case, never wrong.
     const expansion = expandContraction(normalizeToken(t.refWord ?? ''))
     if (expansion) {
@@ -226,8 +226,8 @@ export function miscueRows(tokens) {
       status: t.status,
       label: STATUS_LABEL[t.status] ?? t.status,
       overridden: t.overridden === true,
-      // Insertions carry no refIndex, so score()'s `options.overrides` map -- which is keyed
-      // by reference index -- cannot address them. Results.jsx overrides those positionally
+      // Insertions carry no refIndex, so score()'s `options.overrides` map. Which is keyed
+      // by reference index, cannot address them. Results.jsx overrides those positionally
       // instead; this flag is what tells it which mechanism to use.
       overridableByRefIndex: t.refIndex != null,
       token: t,
@@ -242,7 +242,7 @@ export function miscueRows(tokens) {
   return { errors, events }
 }
 
-/** Words we let through with a reason attached -- the amber column of the results screen. */
+/** Words we let through with a reason attached. The amber column of the results screen. */
 export function suppressedRows(tokens) {
   return tokens
     .map((t, index) => ({ index, token: t }))
