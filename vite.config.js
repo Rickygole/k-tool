@@ -1,5 +1,19 @@
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+
+// onnxruntime's WASM runtime, aliased so it can be imported with `?url`.
+//
+// Three approaches were tried before this one, and the first two are traps:
+//   1. Copy into public/ and point wasmPaths at '/'. Fails -- onnxruntime loads its glue file
+//      with a dynamic import(), and Vite refuses to serve public/ through the module pipeline
+//      ("This file is in /public ... should not be imported from source code").
+//   2. `import '@huggingface/transformers/dist/ort-...wasm?url'`. Fails -- the package's
+//      `exports` map has no subpath entry, so the deep import is blocked at resolution.
+//   3. Alias the real file paths. Works: Vite fingerprints them, emits them into the build,
+//      and hands back same-origin URLs valid in both dev and production.
+const ortAsset = (f) =>
+  fileURLToPath(new URL(`./node_modules/@huggingface/transformers/dist/${f}`, import.meta.url))
 
 // Deliberately bare. Both official transformers.js whisper examples run on a plain Vite 5
 // config -- no optimizeDeps.exclude for the library itself, no wasm path config, no
@@ -12,6 +26,17 @@ import react from '@vitejs/plugin-react'
 // If single-threaded WASM turns out too slow, add them then and re-verify the model download.
 export default defineConfig({
   plugins: [react()],
+
+  // Array form with regexes, not the object form. The imports carry a `?url` suffix, and object
+  // aliases are matched against the whole specifier including the query -- so `ort-wasm-binary`
+  // never matches `ort-wasm-binary?url`. A prefix regex rewrites the path and leaves the query
+  // attached, which is what makes `?url` still apply.
+  resolve: {
+    alias: [
+      { find: /^ort-wasm-binary/, replacement: ortAsset('ort-wasm-simd-threaded.jsep.wasm') },
+      { find: /^ort-wasm-glue/, replacement: ortAsset('ort-wasm-simd-threaded.jsep.mjs') },
+    ],
+  },
 
   // strictPort is load-bearing, not tidiness. transformers.js caches tens of MB of model
   // weights in IndexedDB, and IndexedDB is scoped per origin. If Vite silently falls back to

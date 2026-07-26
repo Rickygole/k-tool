@@ -18,6 +18,16 @@
 import { pipeline, env } from '@huggingface/transformers'
 import { MODEL_ID, PER_DEVICE_CONFIG, transcribeOptions, toAsrResult } from './asrOptions.js'
 
+// `?url` hands these to Vite as ASSETS rather than as modules: it fingerprints them, emits them
+// into the build output, and gives us back a real same-origin URL that works identically in dev
+// and in production.
+//
+// The bare specifiers are aliases defined in vite.config.js -- the package's `exports` map has
+// no subpath entry, so a direct deep import is blocked at resolution. See that file for the two
+// approaches that failed before this one.
+import ortWasmUrl from 'ort-wasm-binary?url'
+import ortMjsUrl from 'ort-wasm-glue?url'
+
 // transformers.js unconditionally points onnxruntime-web's WASM loader at
 // https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/dist/ during its own init, and
 // does so BEFORE onnxruntime's "use the locally bundled asset" branch can run (that branch only
@@ -27,8 +37,10 @@ import { MODEL_ID, PER_DEVICE_CONFIG, transcribeOptions, toAsrResult } from './a
 // That matters beyond tidiness: "nothing leaves the building, works offline" is a claim this
 // project makes out loud about a tool handling children's voices. Pointing this back at our own
 // origin makes the claim literally true and removes a domain a school filter is likely to block.
-// scripts/vendor-ort.mjs puts the files there; it runs on predev and prebuild.
-env.backends.onnx.wasm.wasmPaths = '/'
+//
+// ORT accepts either a string prefix or an explicit {mjs, wasm} pair; the pair is what lets us
+// hand it Vite's fingerprinted asset URLs instead of a directory it would have to guess at.
+env.backends.onnx.wasm.wasmPaths = { mjs: ortMjsUrl, wasm: ortWasmUrl }
 
 let pipe = null
 let loadedWith = null
