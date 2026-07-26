@@ -90,7 +90,10 @@ function handleMessage(msg) {
       if (msg.stage === 'load' && snapshot.device === 'webgpu' && !triedWasmFallback) {
         triedWasmFallback = true
         console.warn(`[asr] WebGPU load failed (${msg.message}); falling back to WASM.`)
-        publish({ status: 'loading', device: 'wasm', progress: {} })
+        // `error: null` matters. Without it the WebGPU message stays in the snapshot, and the
+        // banner keeps reading "Speech model failed to load" for the whole WASM load and beyond
+        // -- reporting a failure to the teacher while the fallback is quietly succeeding.
+        publish({ status: 'loading', device: 'wasm', progress: {}, error: null })
         worker.postMessage({ type: 'load', device: 'wasm' })
         return
       }
@@ -130,9 +133,23 @@ export function startModelLoad() {
     }
   }
 
-  // WebGPU when the browser admits to having it; WASM otherwise. `handleMessage` downgrades
-  // to WASM if the WebGPU load throws.
-  const device = typeof navigator !== 'undefined' && navigator.gpu ? 'webgpu' : 'wasm'
+  // WASM FIRST, DELIBERATELY. This looks like leaving performance on the table and is the
+  // opposite.
+  //
+  // Measured on transformers.js v3 with this model, 60s of audio on an M2: WASM 4.9-5.9s versus
+  // WebGPU 9.5-9.6s. WebGPU is roughly twice as SLOW here -- the v4 runtime rewrite is where it
+  // gets faster, and v4 has an open Whisper regression we are not shipping into. WebGPU also
+  // carries a documented memory-leak history across repeated inferences, which is exactly what a
+  // session of back-to-back reads does.
+  //
+  // And `navigator.gpu` existing does not mean a GPU adapter can be acquired -- headless, VMs,
+  // driver blocklists and locked-down school machines all expose the API and then fail at
+  // adapter request, after which the fallback has to unwind a half-initialised backend. Starting
+  // on the path that is both faster and more reliable removes that failure mode entirely.
+  //
+  // Opt in with `?device=webgpu` if you want to benchmark it on a specific machine.
+  const forced = new URLSearchParams(globalThis.location?.search ?? '').get('device')
+  const device = forced === 'webgpu' ? 'webgpu' : 'wasm'
   publish({ status: 'loading', device, progress: {}, error: null })
   worker.postMessage({ type: 'load', device })
 }

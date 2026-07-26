@@ -22,11 +22,11 @@ import { MODEL_ID, PER_DEVICE_CONFIG, transcribeOptions, toAsrResult } from './a
 // into the build output, and gives us back a real same-origin URL that works identically in dev
 // and in production.
 //
-// The bare specifiers are aliases defined in vite.config.js -- the package's `exports` map has
-// no subpath entry, so a direct deep import is blocked at resolution. See that file for the two
-// approaches that failed before this one.
-import ortWasmUrl from 'ort-wasm-binary?url'
-import ortMjsUrl from 'ort-wasm-glue?url'
+// These live under src/ (copied there by scripts/vendor-ort.mjs on predev/prebuild) rather
+// than being imported from node_modules or served from public/. Both of those were tried and
+// both fail -- see the header of scripts/vendor-ort.mjs for exactly how.
+import ortWasmUrl from '../vendor/ort-wasm-simd-threaded.jsep.wasm?url'
+import ortMjsUrl from '../vendor/ort-wasm-simd-threaded.jsep.mjs?url'
 
 // transformers.js unconditionally points onnxruntime-web's WASM loader at
 // https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/dist/ during its own init, and
