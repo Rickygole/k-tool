@@ -2,6 +2,109 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---------------------------------------------------------------------------------------
+   Design tokens.
+
+   Everything that the accessibility controls can change lives here as a custom property, so
+   that "high contrast" and "larger text" are three CSS rules rather than a prop threaded
+   through thirty components. The controls set data-attributes on <html>; nothing else in the
+   app knows they exist.
+
+   Type scale (1.2 minor third, rounded to the 4px grid):
+     0.75  0.875  1  1.125  1.375  1.75  2.25 rem
+   Spacing is Tailwind's default 4px scale, used at 2/3/4/6/8/12 and nowhere else.
+   --------------------------------------------------------------------------------------- */
+:root {
+  --ra-bg: #f1f4f1;
+  --ra-surface: #ffffff;
+  --ra-fg: #22303a;
+  --ra-muted: #5a6a72;
+  --ra-border: rgba(61, 107, 102, 0.2);
+  --ra-accent: #3d6b66;
+
+  --ra-correct: #2f7d4f;
+  --ra-correct-bg: #e6f2ea;
+  --ra-miscue: #b3261e;
+  --ra-miscue-bg: #fbe9e8;
+  --ra-unsure: #8a5a00;
+  --ra-unsure-bg: #fdf1dc;
+
+  /* 24px is the assessment-materials convention for a passage a child reads aloud. */
+  --ra-passage-size: 1.5rem;
+  --ra-passage-leading: 2;
+  --ra-ui-size: 1rem;
+
+  --ra-font-passage: Literata, Georgia, Cambria, 'Times New Roman', serif;
+  --ra-font-ui: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* Three text sizes. The passage moves further than the interface does: the child needs the
+   bigger text, the teacher is reading the same UI either way. */
+:root[data-size='large'] {
+  --ra-passage-size: 1.875rem;
+  --ra-ui-size: 1.0625rem;
+}
+:root[data-size='xlarge'] {
+  --ra-passage-size: 2.375rem;
+  --ra-passage-leading: 2.1;
+  --ra-ui-size: 1.125rem;
+}
+
+/* Dyslexia-friendly typography.
+
+   A FONT STACK, NOT A WEBFONT. Fetching OpenDyslexic would make the toggle a network
+   dependency, and this app has to work in a classroom with no wifi once the model is cached.
+   OpenDyslexic is listed first anyway so that a school that has installed it system-wide gets
+   it for free; everyone else lands on Comic Sans MS (Windows + Mac, ships with Office) or
+   Chalkboard SE (Mac). Those are humanist, wide-aperture, and have visually distinct b/d/p/q
+   -- which is the actual mechanism, not the branding.
+
+   The letter/word spacing bump is the better-evidenced half of this feature: increased
+   character spacing improves reading speed for dyslexic readers more reliably than any
+   typeface choice does (Zorzi et al., PNAS 2012). */
+:root[data-font='dyslexic'] {
+  --ra-font-passage: OpenDyslexic, 'Comic Sans MS', 'Chalkboard SE', 'Trebuchet MS', Verdana, sans-serif;
+  --ra-font-ui: OpenDyslexic, 'Comic Sans MS', 'Chalkboard SE', 'Trebuchet MS', Verdana, sans-serif;
+  --ra-passage-leading: 2.2;
+}
+:root[data-font='dyslexic'] .passage-text {
+  letter-spacing: 0.045em;
+  word-spacing: 0.16em;
+}
+
+/* High contrast. Not "black on white and lose the meaning" -- the three semantic colours stay
+   distinguishable, they just move to the darkest value that still reads as itself. Every one
+   of these is >= 8:1 against white, and the shape cues are untouched. */
+:root[data-contrast='high'] {
+  --ra-bg: #ffffff;
+  --ra-surface: #ffffff;
+  --ra-fg: #000000;
+  --ra-muted: #2a2a2a;
+  --ra-border: #000000;
+  --ra-accent: #14403c;
+
+  --ra-correct: #14532d;
+  --ra-correct-bg: #ffffff;
+  --ra-miscue: #7a0d09;
+  --ra-miscue-bg: #ffffff;
+  --ra-unsure: #5c3c00;
+  --ra-unsure-bg: #ffffff;
+}
+:root[data-contrast='high'] .card {
+  border-width: 2px;
+  box-shadow: none;
+}
+:root[data-contrast='high'] .word {
+  text-decoration-thickness: 3px;
+}
+
+body {
+  background: var(--ra-bg);
+  color: var(--ra-fg);
+  font-family: var(--ra-font-ui);
+  font-size: var(--ra-ui-size);
+}
+
 @layer components {
   .btn-primary {
     @apply bg-harbor text-mist px-6 py-3 rounded-lg font-medium transition active:scale-[0.98]
@@ -9,10 +112,122 @@
       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-harbor/50 focus-visible:ring-offset-2;
   }
   .card {
-    @apply bg-white border border-harbor/20 rounded-2xl p-6 shadow-sm;
+    background: var(--ra-surface);
+    border: 1px solid var(--ra-border);
+    @apply rounded-2xl p-6 shadow-sm;
   }
   .alert-error {
     @apply px-4 py-3 bg-miscue-bg text-miscue rounded-lg text-sm;
+  }
+
+  /* Secondary and quiet buttons. Same focus treatment as the primary, because a focus ring
+     that only appears on some controls is worse than none. */
+  .btn-secondary {
+    border: 1px solid var(--ra-border);
+    color: var(--ra-fg);
+    background: var(--ra-surface);
+    @apply px-5 py-2.5 rounded-lg font-medium transition hover:border-harbor
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-harbor/50 focus-visible:ring-offset-2
+      disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .btn-quiet {
+    color: var(--ra-muted);
+    @apply px-3 py-1.5 rounded-md text-sm transition hover:text-ink hover:bg-black/5
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-harbor/50;
+  }
+
+  /* A selectable card (student, passage). Whole card is one button so the hit target matches
+     the visual target -- no "the name is a link but the card is not" ambiguity. */
+  .choice-card {
+    background: var(--ra-surface);
+    border: 1px solid var(--ra-border);
+    @apply w-full text-left rounded-2xl p-5 shadow-sm transition
+      hover:-translate-y-0.5 hover:shadow-md hover:border-harbor
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-harbor focus-visible:ring-offset-2;
+    transition-duration: 180ms;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .choice-card[aria-current='true'] {
+    border-color: var(--ra-accent);
+    box-shadow: inset 0 0 0 1px var(--ra-accent);
+  }
+
+  .passage-text {
+    font-family: var(--ra-font-passage);
+    font-size: var(--ra-passage-size);
+    line-height: var(--ra-passage-leading);
+  }
+
+  /* --- Scored words -------------------------------------------------------------------
+     Colour is never the only signal. Correct words are undecorated; every other state adds
+     an underline style and a glyph, both of which survive greyscale printing and colour
+     vision deficiency. */
+  .word {
+    @apply rounded px-0.5;
+    text-underline-offset: 0.22em;
+  }
+  .word-ok {
+    color: var(--ra-fg);
+  }
+  .word-note {
+    color: var(--ra-correct);
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-decoration-thickness: 2px;
+  }
+  .word-unsure {
+    color: var(--ra-unsure);
+    background: var(--ra-unsure-bg);
+    text-decoration: underline;
+    text-decoration-style: wavy;
+    text-decoration-thickness: 1px;
+  }
+  .word-miscue {
+    color: var(--ra-miscue);
+    background: var(--ra-miscue-bg);
+    text-decoration: underline;
+    text-decoration-style: solid;
+    text-decoration-thickness: 2px;
+  }
+  /* An omitted word was never spoken. Striking it through is the running-record convention
+     and it means the mark is legible with no colour at all. */
+  .word-omitted {
+    text-decoration: line-through solid 2px;
+  }
+  .word-glyph {
+    @apply align-super font-sans font-semibold;
+    font-size: 0.5em;
+    letter-spacing: 0.04em;
+  }
+  .word-interactive {
+    @apply cursor-help;
+  }
+  .word-interactive:focus-visible {
+    @apply outline-none ring-2 ring-harbor rounded;
+  }
+
+  .tooltip {
+    background: var(--ra-fg);
+    color: var(--ra-bg);
+    @apply pointer-events-none absolute left-1/2 bottom-full z-20 mb-2 w-64 -translate-x-1/2
+      rounded-lg px-3 py-2 text-left text-xs leading-relaxed opacity-0 shadow-lg;
+    font-family: var(--ra-font-ui);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    transition: opacity 160ms ease-out;
+  }
+  .word-interactive:hover .tooltip,
+  .word-interactive:focus-visible .tooltip {
+    @apply opacity-100;
+  }
+
+  .metric-value {
+    @apply font-display tabular-nums leading-none;
+    font-size: 2.25rem;
+  }
+  .field-label {
+    color: var(--ra-muted);
+    @apply text-xs font-semibold uppercase tracking-wider;
   }
 }
 
@@ -43,5 +258,46 @@
   }
   .no-print {
     display: none !important;
+  }
+
+  /* The report has to be readable off a black-and-white classroom printer, which is the only
+     printer in most schools. Colour is dropped entirely and the shape cues carry the whole
+     signal: solid underline = miscue, wavy = not counted, strikethrough = not read. */
+  .print-area {
+    background: #fff;
+    color: #000;
+    font-size: 11pt;
+  }
+  .print-area .word,
+  .print-area .word-ok,
+  .print-area .word-note,
+  .print-area .word-unsure,
+  .print-area .word-miscue {
+    color: #000;
+    background: transparent;
+  }
+  .print-area .passage-text {
+    font-size: 12pt;
+    line-height: 1.9;
+  }
+  .print-area .card {
+    border: 1px solid #000;
+    box-shadow: none;
+    border-radius: 4px;
+    padding: 8px 10px;
+  }
+  .print-area table {
+    border-collapse: collapse;
+  }
+  .print-area th,
+  .print-area td {
+    border: 1px solid #000;
+    padding: 3px 6px;
+  }
+  .tooltip {
+    display: none !important;
+  }
+  @page {
+    margin: 12mm;
   }
 }

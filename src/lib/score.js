@@ -115,8 +115,19 @@ export function score(referenceText, asrResult, options = {}) {
     const refDisplay = op.refIndex != null ? ref.original[op.refIndex] : null
     const hypDisplay = op.hypIndex != null ? hyp.original[op.hypIndex] : null
 
+    // Insertions have no reference index by definition, but they still have a PLACE -- the
+    // passage position they interrupt. Without it an insertion is unanchored: the UI cannot
+    // draw a marker between two words, and the evaluation cannot check whether an insertion
+    // was detected in the right spot (it scored 0% precision until this existed, not because
+    // detection was wrong but because every hit was positionally unmatchable).
+    const anchorRefIndex =
+      op.refIndex != null
+        ? op.refIndex
+        : (nextRefIndexOf(ops, k) ?? (lastRefIndex(tokens) != null ? lastRefIndex(tokens) + 1 : 0))
+
     const base = {
       refIndex: op.refIndex,
+      anchorRefIndex,
       refWord: refDisplay,
       hypWord: hypDisplay,
       confidence: /** @type {'high'|'low'} */ ('high'),
@@ -219,6 +230,14 @@ export function score(referenceText, asrResult, options = {}) {
 function lastRefIndex(tokens) {
   for (let i = tokens.length - 1; i >= 0; i--) {
     if (tokens[i].refIndex != null) return tokens[i].refIndex
+  }
+  return null
+}
+
+/** Reference index of the next op that consumes a reference word, looking forward from k. */
+function nextRefIndexOf(ops, k) {
+  for (let i = k + 1; i < ops.length; i++) {
+    if (ops[i].refIndex != null) return ops[i].refIndex
   }
   return null
 }
