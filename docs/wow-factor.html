@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ReadAloud — Wow Factor</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    margin: 0;
+    font-family: "IBM Plex Sans", -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 9.6pt;
+    line-height: 1.5;
+    color: #22303a;
+  }
+  h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; font-weight: 600; margin: 0; }
+  h1 { font-size: 25pt; letter-spacing: -0.4pt; line-height: 1.1; }
+  h2 {
+    font-size: 13pt; margin: 15pt 0 6pt; padding-bottom: 3pt;
+    border-bottom: 1.5pt solid #3d6b66; color: #3d6b66;
+  }
+  h3 { font-size: 10.4pt; margin: 10pt 0 3pt; }
+  p { margin: 0 0 6pt; }
+  ul { margin: 0 0 6pt; padding-left: 14pt; }
+  li { margin-bottom: 2.5pt; }
+  strong { font-weight: 600; }
+  .muted { color: #5a6a72; }
+  .lede { font-size: 11pt; line-height: 1.5; color: #2c3d47; }
+
+  header { border-bottom: 2.5pt solid #22303a; padding-bottom: 9pt; margin-bottom: 12pt; }
+  .kicker {
+    font-size: 7.5pt; text-transform: uppercase; letter-spacing: 1.3pt;
+    color: #3d6b66; font-weight: 600; margin-bottom: 5pt;
+  }
+  .tagline { font-size: 10.6pt; color: #5a6a72; margin-top: 4pt; font-style: italic; }
+
+  .hero {
+    background: #f1f4f1; border-left: 3.5pt solid #E3A857;
+    padding: 9pt 12pt; margin: 10pt 0 12pt;
+  }
+  .hero .big { font-family: Georgia, serif; font-size: 12.5pt; line-height: 1.4; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10pt 16pt; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7pt; }
+
+  .stat {
+    border: 0.8pt solid #d4dcd8; border-radius: 4pt; padding: 6pt 8pt; text-align: center;
+  }
+  .stat .n {
+    font-family: Georgia, serif; font-size: 16pt; font-weight: 600;
+    color: #2f7d4f; display: block; line-height: 1.1;
+  }
+  .stat .n.amber { color: #8a5a00; }
+  .stat .n.ink { color: #22303a; }
+  .stat .l { font-size: 7.2pt; color: #5a6a72; text-transform: uppercase; letter-spacing: 0.4pt; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8.6pt; margin: 5pt 0 7pt; }
+  th, td { text-align: left; padding: 3.5pt 5pt; border-bottom: 0.6pt solid #e3e8e5; }
+  th { font-size: 7.4pt; text-transform: uppercase; letter-spacing: 0.5pt; color: #5a6a72; font-weight: 600; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  .chip {
+    display: inline-block; font-size: 7.4pt; padding: 1.5pt 5pt; border-radius: 8pt;
+    background: #e6f2ea; color: #2f7d4f; font-weight: 600; margin-right: 3pt;
+  }
+  .chip.amber { background: #fdf1dc; color: #8a5a00; }
+  .chip.red { background: #fbe9e8; color: #b3261e; }
+
+  .callout {
+    border: 1pt solid #E3A857; background: #fdf9f0; border-radius: 4pt;
+    padding: 8pt 10pt; margin: 8pt 0;
+  }
+  .demo-step { display: grid; grid-template-columns: 34pt 1fr; gap: 7pt; margin-bottom: 5pt; }
+  .demo-time {
+    font-family: Georgia, serif; font-weight: 600; color: #3d6b66; font-size: 9.4pt;
+  }
+  .page-break { page-break-before: always; }
+  footer {
+    margin-top: 12pt; padding-top: 6pt; border-top: 0.8pt solid #d4dcd8;
+    font-size: 7.6pt; color: #5a6a72;
+  }
+  code {
+    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    font-size: 8.2pt; background: #f1f4f1; padding: 0.5pt 3pt; border-radius: 2pt;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kicker">CEAMLS · Human-AI Collaboration Challenge</div>
+  <h1>ReadAloud</h1>
+  <div class="tagline">Oral reading fluency assessment that runs entirely on the teacher's laptop.</div>
+</header>
+
+<p class="lede">
+  A child reads a passage aloud for one minute. Whisper transcribes it <strong>on the device</strong>,
+  a sequence-alignment engine compares what was heard against the passage the child was supposed to
+  read, and every deviation is classified as a specific miscue. The teacher gets a running record:
+  words correct per minute, accuracy, instructional level, percentile band, and a printable one-pager.
+</p>
+
+<div class="hero">
+  <div class="big">
+    The speech model is not the product. Anyone can run Whisper.<br>
+    <strong>The product is the scoring layer — and specifically its restraint.</strong>
+  </div>
+  <p class="muted" style="margin:5pt 0 0; font-size:8.8pt;">
+    Four filters that refuse to call a deviation an error when the evidence does not support it.
+    Each one named, counted, disclosed, and overridable in both directions.
+  </p>
+</div>
+
+<h2>The problem it solves</h2>
+<div class="grid2">
+  <div>
+    <p>
+      A running record is the most informative minute in elementary literacy assessment, and the most
+      expensive to collect. A teacher sits one-to-one with each child, three times a year, hand-marking
+      every error in real time while the rest of the class does something else.
+    </p>
+    <p>
+      The tallying is tedious, the arithmetic is error-prone, and scoring drifts between one adult and
+      the next — so the same child can be recorded differently depending on who held the pencil.
+    </p>
+  </div>
+  <div>
+    <p>
+      ReadAloud removes the tallying and applies identical rules every time. Because nothing leaves the
+      laptop, a district does not have to ship recordings of children's voices to a vendor in order to
+      get automated scoring.
+    </p>
+    <p>
+      <strong>Who it is for:</strong> K–6 classroom teachers, reading specialists, and any school
+      operating under a universal early-literacy screening mandate but without funded staff time to
+      meet it.
+    </p>
+  </div>
+</div>
+
+<h2>The wow factor</h2>
+<div class="callout">
+  <h3 style="margin-top:0;">It reports a negative result about its own headline feature.</h3>
+  <p style="margin-bottom:0;">
+    The dialect-sensitive suppression layer — built so a child speaking African American English is not
+    scored down for pronunciation — <strong>fires zero times.</strong> We measured it. Whisper normalises
+    the features into standard orthography (<code>aksed</code> → <code>asked</code>,
+    <code>wif</code> → <code>with</code>) before our rules ever see them. We published the zero, explained
+    the mechanism, and shrank the claim to the part that survived.
+  </p>
+</div>
+<p>
+  Every submission claims its equity feature works. This one measured whether its own does, found that it
+  does not, and said so — then reported the <em>larger</em> finding the measurement surfaced: Whisper
+  mis-segments dialect speech at word boundaries (<code>dis col</code> → <code>Diskal</code>), which costs
+  a dialect-speaking reader real errors that no phonological rule can reach.
+</p>
+
+<h3>Three more things that survived adversarial review</h3>
+<ul>
+  <li>
+    <strong>116 real-word pairs were being forgiven</strong> by the suppression stack —
+    <code>house</code>/<code>horse</code>, <code>her</code>/<code>he</code>, <code>bad</code>/<code>bat</code>.
+    A child who could not decode <em>house</em> was scored 100% correct and never referred. All closed,
+    with a single gate above all four filters and regression tests for each.
+  </li>
+  <li>
+    <strong>Two of six commonly-quoted norm figures were from the wrong edition.</strong> Grade 4 spring is
+    133 and grade 6 is 146 in the 2017 revision; the 1996-era values still circulate widely. Caught by
+    checking the primary source digit-by-digit.
+  </li>
+  <li>
+    <strong>A live defect where <code>showed</code> → <code>said</code> scored as correct.</strong> Soundex
+    ignores vowels, so a comprehension-breaking substitution was being erased. Fixing it raised substitution
+    recall from 80% to 90% <em>with zero new false positives.</em>
+  </li>
+</ul>
+
+<h2>Measured results</h2>
+<div class="grid3" style="margin-bottom:8pt;">
+  <div class="stat"><span class="n">0.48%</span><span class="l">False positives, clean reads</span></div>
+  <div class="stat"><span class="n">0.4</span><span class="l">Mean WCPM error</span></div>
+  <div class="stat"><span class="n ink">77</span><span class="l">Automated tests, all green</span></div>
+</div>
+
+<table>
+  <thead><tr><th>Miscue type</th><th class="num">Precision</th><th class="num">Recall</th><th class="num">F1</th></tr></thead>
+  <tbody>
+    <tr><td>Substitution</td><td class="num">81.8%</td><td class="num">90.0%</td><td class="num">85.7%</td></tr>
+    <tr><td>Omission</td><td class="num">93.8%</td><td class="num">100.0%</td><td class="num">96.8%</td></tr>
+    <tr><td>Insertion</td><td class="num">83.3%</td><td class="num">100.0%</td><td class="num">90.9%</td></tr>
+    <tr><td>Self-correction</td><td class="num">100.0%</td><td class="num">40.0%</td><td class="num">57.1%</td></tr>
+  </tbody>
+</table>
+<p class="muted" style="font-size:8.4pt;">
+  Five passages, grades 2–4, fifty planted miscues. Ground truth is <strong>constructed, not annotated</strong>:
+  the spoken text is generated from the reference by applying an explicit error script, so the correct answer
+  is known with certainty. A detection counts only if it flags the same position with the same type.
+  <strong>The false-positive rate is the number we optimised</strong> — telling a child who read correctly that
+  they made a mistake is a worse failure than missing an error.
+</p>
+
+<div class="page-break"></div>
+
+<h2>How to demo it — three minutes</h2>
+
+<div class="demo-step"><div class="demo-time">0:00</div><div>
+  <strong>Turn the wifi off. On stage, visibly. Then keep going.</strong>
+  Verified in a real browser with every external host blocked: full record → transcribe → score → print,
+  zero outbound requests. This is the most memorable twenty seconds available to you.
+</div></div>
+
+<div class="demo-step"><div class="demo-time">0:20</div><div>
+  <strong>Hand the microphone to a judge.</strong> "Would you read this paragraph out loud for me?"
+  Then say nothing at all. Let the screen do the work.
+</div></div>
+
+<div class="demo-step"><div class="demo-time">1:20</div><div>
+  <strong>Point at amber.</strong> Green is correct, red is a miscue, amber is <em>"we are not confident
+  enough to call this an error, so we do not."</em> Click one amber word → <strong>Count as an error.</strong>
+  Every number recomputes live. The line: <em>the teacher is the assessor, we are the stopwatch — and the
+  override runs both ways.</em>
+</div></div>
+
+<div class="demo-step"><div class="demo-time">2:00</div><div>
+  <strong>Click "Show the student."</strong> Same read, same words, child's language:
+  <em>"You read 39 of 40 words just right."</em> No percentile, no instructional level, no "frustration."
+  The child is finally addressed rather than only measured.
+</div></div>
+
+<div class="demo-step"><div class="demo-time">2:20</div><div>
+  <strong>Show the zero.</strong> "Our dialect layer fired zero times across the whole evaluation.
+  We measured it, and we published the zero."
+</div></div>
+
+<div class="demo-step"><div class="demo-time">2:45</div><div>
+  <strong>Hand them the printed report.</strong> Physical paper at a software demo is disproportionately
+  memorable. Then stop talking.
+</div></div>
+
+<p class="callout" style="margin-top:8pt;">
+  <strong>Insurance:</strong> <code>Ctrl</code>+<code>Shift</code>+<code>D</code> pushes a bundled recording
+  through the <em>real</em> pipeline — same decode, same model, same scorer. If the microphone dies or the hall
+  is too loud, the demo continues and nothing is faked.
+  <br><strong>Before you start:</strong> <code>lsof -ti :5174 | xargs kill</code> — a stale dev server will
+  otherwise block the port.
+</p>
+
+<h2>Everything it does</h2>
+
+<h3>Assessment engine</h3>
+<ul>
+  <li><strong>Local speech recognition</strong> — Whisper <code>base.en</code> in a Web Worker via transformers.js, WASM by default (measured ~2× faster than WebGPU on Apple silicon for this workload).</li>
+  <li><strong>Needleman-Wunsch global alignment</strong> of transcript against the known passage, with diagonal tie-breaking so deviations read as substitutions rather than omission/insertion pairs — matching how a human marks a running record.</li>
+  <li><strong>Five miscue types</strong> — substitution, omission, insertion, self-correction, repetition. Repetitions and self-corrections are not errors, per running-record convention; self-corrections are counted separately as a positive signal of monitoring.</li>
+  <li><strong>Four suppression filters</strong>, most-specific-first: dialect, homophone, fuzzy, phonetic. Each records <em>which</em> filter fired and why.</li>
+  <li><strong>A common-word gate above all four</strong> — if both words are ordinary English, no approximate filter may bridge them. This is what stops a decoding error being erased.</li>
+  <li><strong>Validity gates</strong> — silence, empty passage, too-short reads, implausible rates, and Whisper repetition loops or trailing hallucinations ("Thanks for watching!") are refused rather than scored. An unscoreable read carries <em>no</em> verdict, so no UI can render one.</li>
+  <li><strong>Metrics</strong> — WCPM, accuracy, self-correction rate as a <code>1:N</code> ratio, instructional level, percentile band. WCPM excludes insertions (the norms' own procedure); accuracy includes them (running-record convention).</li>
+</ul>
+
+<h3>Equity and honesty</h3>
+<ul>
+  <li><strong>Dialect-sensitive layer</strong> — seven auditable rules (th-stopping restricted to voiced /ð/, th-fronting, r-lessness, final devoicing, cluster reduction guarded against <code>-ed</code>/<code>-s</code>, metathesis, g-dropping guarded against monomorphemic <code>-ing</code>), plus copula absence gated to <code>is</code>/<code>are</code> only.</li>
+  <li><strong>Nothing is ever suppressed silently</strong> — every forgiven word appears in a panel with the rule that forgave it.</li>
+  <li><strong>Bidirectional teacher override</strong> — any flagged word can be marked correct, <em>and any suppressed word can be counted as an error.</em> Without the second direction, every control in the system would push the score upward.</li>
+  <li><strong>Norms verified against the primary source</strong>, reported as bands rather than point estimates. Below the published floor reports "below 10th"; grades outside the table report no band at all.</li>
+</ul>
+
+<h3>Interface</h3>
+<ul>
+  <li>Student select → passage select → read → results → printable teacher report.</li>
+  <li><strong>Live input-level meter</strong> during recording, so a dead microphone is visible immediately.</li>
+  <li><strong>Colour-coded passage</strong> — and colour never travels alone: every marked word also carries a glyph and an underline style, so the marking survives greyscale printing and colour-vision deficiency.</li>
+  <li><strong>Student-facing view</strong> — the same record in a child's language.</li>
+  <li><strong>Printable one-page running record</strong> for the teacher.</li>
+  <li><strong>Accessibility</strong> — dyslexia-friendly font stack (no webfont, so it works offline), three text sizes, high-contrast mode, full keyboard navigation, reduced-motion support.</li>
+  <li><strong>Six original passages</strong>, grades 2–4, written for this project.</li>
+</ul>
+
+<h3>Architecture</h3>
+<ul>
+  <li><span class="chip">No server</span><span class="chip">No API key</span><span class="chip">No database</span><span class="chip">No account</span><span class="chip amber">No language model anywhere</span></li>
+  <li>There is no LLM in this product, so it <strong>cannot hallucinate</strong>. Alignment plus a rule set from the literacy assessment literature — deterministic and reproducible, which is what an assessment affecting a child's placement requires.</li>
+  <li>Works fully offline once the model is cached — <strong>empirically verified</strong> with all external hosts blocked.</li>
+  <li>Reproducible evaluation harness with committed results and a smoke test that exercises the real model.</li>
+</ul>
+
+<h2>Stated limitations</h2>
+<p>
+  The evaluation uses synthesised speech, so <strong>this has never been run on a child's voice</strong> — the
+  largest unknown in the system. Self-correction recall is 40% by construction: a purely semantic
+  self-correction is indistinguishable from an inserted word without a language model, and there is
+  deliberately no language model. Published norms cover grades 1–6 only. It is a screening aid and a
+  research prototype, not a validated instrument; the path to one is an inter-rater reliability study
+  against certified human scorers, stratified by dialect.
+</p>
+
+<footer>
+  <strong>Sources.</strong> Hasbrouck &amp; Tindal (2017), <em>An update to compiled ORF norms</em>, Tech. Report 1702,
+  University of Oregon · Fuchs, Fuchs, Hosp &amp; Jenkins (2001), <em>Scientific Studies of Reading</em> 5(3) ·
+  Labov &amp; Baker (2010), <em>Applied Psycholinguistics</em> 31(4) · Charity, Scarborough &amp; Griffin (2004),
+  <em>Child Development</em> 75(5) · Goodman &amp; Buck (1973), <em>The Reading Teacher</em> 27(1) ·
+  Koenecke et al. (2020), <em>PNAS</em> 117(14).
+</footer>
+
+</body>
+</html>
