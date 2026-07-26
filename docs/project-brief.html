@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ReadAloud — Complete Project Brief</title>
+<style>
+  @page { size: A4; margin: 15mm 14mm; }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{font-family:"IBM Plex Sans",-apple-system,"Segoe UI",system-ui,sans-serif;
+       font-size:9.3pt;line-height:1.5;color:#22303a}
+  h1,h2,h3,h4{font-family:Georgia,"Times New Roman",serif;font-weight:600;margin:0}
+  h1{font-size:26pt;letter-spacing:-.5pt;line-height:1.06}
+  h2{font-size:14pt;margin:16pt 0 6pt;padding-bottom:3pt;border-bottom:1.5pt solid #3d6b66;color:#3d6b66}
+  h3{font-size:10.8pt;margin:11pt 0 3pt}
+  h4{font-size:9.6pt;margin:8pt 0 2pt;font-family:inherit;font-weight:600}
+  p{margin:0 0 6pt}
+  ul,ol{margin:0 0 6pt;padding-left:14pt}
+  li{margin-bottom:3pt}
+  .muted{color:#5a6a72}
+  .lede{font-size:10.6pt;line-height:1.5;color:#2c3d47}
+  header{border-bottom:2.5pt solid #22303a;padding-bottom:9pt;margin-bottom:11pt}
+  .kicker{font-size:7.4pt;text-transform:uppercase;letter-spacing:1.3pt;color:#3d6b66;font-weight:600;margin-bottom:5pt}
+  .tagline{font-size:10.4pt;color:#5a6a72;margin-top:4pt;font-style:italic}
+  .box{background:#f1f4f1;border-left:3.5pt solid #E3A857;padding:8pt 11pt;margin:9pt 0}
+  .box.green{border-left-color:#2f7d4f}
+  .box.red{border-left-color:#b3261e}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:9pt 16pt}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:7pt}
+  .stat{border:.8pt solid #d4dcd8;border-radius:4pt;padding:6pt 8pt;text-align:center}
+  .stat .n{font-family:Georgia,serif;font-size:15pt;font-weight:600;color:#2f7d4f;display:block;line-height:1.1}
+  .stat .l{font-size:7pt;color:#5a6a72;text-transform:uppercase;letter-spacing:.4pt}
+  table{width:100%;border-collapse:collapse;font-size:8.4pt;margin:5pt 0 7pt}
+  th,td{text-align:left;padding:3.2pt 5pt;border-bottom:.6pt solid #e3e8e5;vertical-align:top}
+  th{font-size:7.2pt;text-transform:uppercase;letter-spacing:.5pt;color:#5a6a72;font-weight:600}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  code{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-size:8pt;background:#f1f4f1;padding:.5pt 3pt;border-radius:2pt}
+  .quote{font-family:Georgia,serif;font-size:11.5pt;line-height:1.38;color:#22303a;margin:7pt 0;padding-left:10pt;border-left:2pt solid #E3A857}
+  .pill{display:inline-block;font-size:7.4pt;padding:1.5pt 6pt;border-radius:9pt;background:#e6f2ea;color:#2f7d4f;font-weight:600;margin:0 3pt 3pt 0}
+  .pill.a{background:#fdf1dc;color:#8a5a00}
+  .page{page-break-before:always}
+  footer{margin-top:11pt;padding-top:6pt;border-top:.8pt solid #d4dcd8;font-size:7.4pt;color:#5a6a72}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kicker">Complete project brief · CEAMLS Human-AI Collaboration Challenge</div>
+  <h1>ReadAloud</h1>
+  <div class="tagline">Oral reading fluency assessment that runs entirely on a teacher's laptop.</div>
+</header>
+
+<h2>Start here, if you know nothing about this</h2>
+<p class="lede">
+  In primary school, teachers regularly check how well each child can read out loud. The standard
+  method is called a <strong>running record</strong>. The teacher sits one to one with a child, the
+  child reads a short passage aloud for about a minute, and the teacher marks every word that goes
+  wrong: words misread, words skipped, words added, words the child corrected on their own.
+</p>
+<p>
+  From those marks the teacher works out a score. How many words per minute the child read
+  correctly, what percentage of the passage was accurate, and whether this text is at the right
+  level for them. It is one of the most informative minutes in early education, and it is done for
+  every child, several times a year.
+</p>
+<p>
+  <strong>ReadAloud does the marking.</strong> The child reads into a laptop. Speech recognition
+  runs on that laptop, the software compares what it heard against the passage the child was given,
+  classifies every difference, and produces the same running record a teacher would have written by
+  hand. Nothing is uploaded. There is no account, no subscription, and no internet connection
+  required once it has been set up.
+</p>
+
+<div class="box">
+  <strong>The one sentence version.</strong> A child reads aloud for a minute, the laptop scores it
+  the way a trained teacher would, and no recording of that child's voice ever leaves the room.
+</div>
+
+<h2>The problem it addresses</h2>
+<div class="grid2">
+  <div>
+    <h4>Time</h4>
+    <p class="muted">A class of 28 children, assessed three times a year, is 84 individual sessions.
+    Each one is roughly a minute of reading and several more minutes of tallying and arithmetic.
+    The tallying is the part that consumes the teacher, and the other 27 children are unsupervised
+    while it happens.</p>
+    <h4>Consistency</h4>
+    <p class="muted">Two teachers scoring the same recording will not always agree. Whether a
+    hesitation counts, whether a self correction counts, whether a mispronunciation is a decoding
+    error, all vary between scorers and between the same scorer on different days. A child's record
+    partly reflects who held the pencil.</p>
+  </div>
+  <div>
+    <h4>Privacy</h4>
+    <p class="muted">Existing automated tools send the audio to a vendor's servers. That means
+    recordings of children's voices, often children already identified as struggling readers,
+    leaving the school and accumulating in a third party's storage. Districts have to weigh that
+    against the benefit.</p>
+    <h4>Cost and access</h4>
+    <p class="muted">Commercial reading assessment platforms are licensed per student per year.
+    Schools with the least funding, which are frequently the schools with the most struggling
+    readers, are the least able to buy them.</p>
+  </div>
+</div>
+
+<h2>How it works</h2>
+<p>
+  The key idea is that <strong>this is not transcription, it is alignment</strong>. A general speech
+  recogniser has to decide which of roughly forty thousand English words it just heard. ReadAloud
+  already knows what the passage says, so it only has to decide how what it heard differs from about
+  a hundred known words. That is a far smaller and far more tractable problem, and it is why the
+  system can be accurate without a large model.
+</p>
+<table>
+  <thead><tr><th style="width:26%">Stage</th><th>What happens</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Record</strong></td><td>Browser captures the audio at 16kHz mono. A live input meter shows the microphone is working, because a dead mic is otherwise invisible until it is too late.</td></tr>
+    <tr><td><strong>Transcribe</strong></td><td>OpenAI's Whisper model, converted to run in the browser, produces a transcript with a timestamp for every word. This runs on the device, in a background thread.</td></tr>
+    <tr><td><strong>Align</strong></td><td>The Needleman-Wunsch algorithm, borrowed from bioinformatics, finds the best correspondence between what was heard and what was written. It handles insertions, deletions and substitutions in one pass.</td></tr>
+    <tr><td><strong>Classify</strong></td><td>Each difference is labelled: substitution, omission, insertion, self correction or repetition. Repetitions and self corrections are not errors, per standard running record convention.</td></tr>
+    <tr><td><strong>Filter</strong></td><td>Four filters decline to score things that are not reading errors: homophones, dialect features, near identical spellings, and phonetic near misses. Every one is recorded and shown.</td></tr>
+    <tr><td><strong>Report</strong></td><td>Words correct per minute, accuracy, self correction rate, instructional level, percentile band against published norms, and a printable one page record.</td></tr>
+  </tbody>
+</table>
+
+<div class="page"></div>
+
+<h2>What makes it different</h2>
+
+<div class="box green">
+  <h3 style="margin-top:0">1. There is no language model in it, so it cannot make things up.</h3>
+  <p style="margin-bottom:0">Whisper converts sound to text and nothing else. Everything after that
+  is a sequence alignment algorithm and a rule set drawn from the literacy assessment literature.
+  The same audio always produces the same score. In a tool that influences how a child is placed,
+  a system that cannot be reproduced is not a measurement, it is an opinion.</p>
+</div>
+
+<div class="box green">
+  <h3 style="margin-top:0">2. No API key, no account, no server, no subscription.</h3>
+  <p style="margin-bottom:0">The entire application is a static website. There is no backend to
+  operate, nothing to log into, no per student licence, and no ongoing cost of any kind. It has been
+  verified running with every external network host blocked: record, transcribe, score and print
+  all completed with zero outbound requests. A school can put it on a USB stick.</p>
+</div>
+
+<div class="box green">
+  <h3 style="margin-top:0">3. It shows its uncertainty instead of hiding it.</h3>
+  <p style="margin-bottom:0">Words are green, red, or <strong>amber</strong>. Amber means the system
+  heard something different but is not confident enough to call it an error, so it does not. Every
+  amber word is listed with the specific rule that forgave it. A tool that silently forgives is
+  making a claim it never shows you.</p>
+</div>
+
+<div class="box green">
+  <h3 style="margin-top:0">4. The teacher can overrule it in both directions.</h3>
+  <p style="margin-bottom:0">Any flagged word can be marked correct, <em>and any forgiven word can
+  be counted as an error</em>. That second direction is unusual and it matters: four filters in this
+  system can only ever remove errors, so if the only control were the power to forgive, every
+  adjustment the tool offered would push a child's score upward.</p>
+</div>
+
+<div class="box">
+  <h3 style="margin-top:0">5. It measured its own headline feature and published a failure.</h3>
+  <p style="margin-bottom:0">See the next section. This is the thing that most distinguishes the
+  project, and it is not a feature at all.</p>
+</div>
+
+<h2>The finding that defines the project</h2>
+<p>
+  The most ambitious part of ReadAloud is a <strong>dialect sensitive layer</strong>. Miscue analysis
+  has a long documented history of scoring dialect features as reading errors, which systematically
+  mislabels fluent speakers of African American English as struggling readers. Speech recognisers
+  compound it: Koenecke et al. (PNAS, 2020) measured roughly double the word error rate for Black
+  speakers across all five major commercial systems. So the layer encodes linguistic rules that
+  refuse to score a dialect consistent pronunciation as a mistake.
+</p>
+<p><strong>Then we measured whether it ever activates. Across the entire evaluation, it fired zero times.</strong></p>
+<p>
+  The reason is structural. Whisper is trained to produce standard spelling, so it rewrites the
+  dialect features into standard forms before our rules can ever see them. <code>aksed</code> becomes
+  <code>asked</code>. <code>wif</code> becomes <code>with</code>. <code>sista</code> becomes
+  <code>sister</code>. The layer is looking for something that has already been erased.
+</p>
+<div class="box red">
+  <p style="margin-bottom:0"><strong>What the measurement found instead is larger.</strong> Where
+  Whisper does not normalise, it <em>mis-segments</em>. Spoken "dis col" comes back as
+  <strong>Diskal</strong>. "fo fo" comes back as <strong>Fofo</strong>. Two words fuse into one, or
+  one splits into two. Scored end to end, a dialect speaking reader is charged five errors on a
+  twelve word passage. That is a real, quantified bias, and no rule about pronunciation can reach
+  it, because the damage is to the word boundaries rather than to the words.</p>
+</div>
+<p>
+  We published the zero, explained the mechanism, and reduced the claim to the part that survives:
+  the equity contribution is the <em>architecture</em>, not the rule table. Aligning against a known
+  hundred word passage collapses the recognition problem enough to absorb most accent driven error
+  structurally. And no child's voice leaves the device.
+</p>
+
+<h2>Measured results</h2>
+<div class="grid3" style="margin-bottom:7pt">
+  <div class="stat"><span class="n">0.48%</span><span class="l">False positives, clean reads</span></div>
+  <div class="stat"><span class="n">0.4</span><span class="l">Mean WCPM error</span></div>
+  <div class="stat"><span class="n" style="color:#22303a">77</span><span class="l">Automated tests, all passing</span></div>
+</div>
+<table>
+  <thead><tr><th>Miscue type</th><th class="num">Precision</th><th class="num">Recall</th><th class="num">F1</th></tr></thead>
+  <tbody>
+    <tr><td>Substitution (word misread)</td><td class="num">81.8%</td><td class="num">90.0%</td><td class="num">85.7%</td></tr>
+    <tr><td>Omission (word skipped)</td><td class="num">93.8%</td><td class="num">100.0%</td><td class="num">96.8%</td></tr>
+    <tr><td>Insertion (word added)</td><td class="num">83.3%</td><td class="num">100.0%</td><td class="num">90.9%</td></tr>
+    <tr><td>Self correction</td><td class="num">100.0%</td><td class="num">40.0%</td><td class="num">57.1%</td></tr>
+  </tbody>
+</table>
+<p class="muted">
+  Five passages, fifty deliberately planted miscues. Ground truth is <strong>constructed, not
+  annotated</strong>: the spoken text is generated from the reference by applying an explicit error
+  script, so the correct answer is known with certainty and there is no labelling step to disagree
+  with. A detection only counts if it flags the same position with the same type.
+</p>
+<p>
+  <strong>The false positive rate is the number that was optimised, and it is the one to lead with.</strong>
+  Telling a child who read correctly that they made a mistake is a worse failure than missing an
+  error, and those two do not trade off evenly in a classroom.
+</p>
+
+<div class="page"></div>
+
+<h2>Strengths</h2>
+<ul>
+  <li><strong>Cannot hallucinate.</strong> No generative model anywhere in the scoring path. Deterministic and reproducible.</li>
+  <li><strong>Complete privacy.</strong> No audio or transcript leaves the machine, verified empirically under network denial, not merely claimed.</li>
+  <li><strong>Zero marginal cost.</strong> No licence, no per student fee, no API billing. Runs on hardware schools already own.</li>
+  <li><strong>Works offline.</strong> After a one time model download, no connectivity is needed. Relevant for rural schools and locked down networks.</li>
+  <li><strong>Auditable.</strong> Roughly 1,500 lines of readable, tested, cited scoring logic. Every suppression names the rule that caused it. A district can inspect exactly why a child received a score.</li>
+  <li><strong>Norms verified at source.</strong> Every figure checked digit by digit against Hasbrouck &amp; Tindal (2017). Two of the six commonly quoted spring medians turned out to be circulating in an outdated form.</li>
+  <li><strong>Honest about uncertainty.</strong> Percentiles are reported as bands, never point estimates. Below the published floor reports "below 10th" rather than inventing a number. Grades without published norms report none.</li>
+  <li><strong>Refuses to score bad input.</strong> Silence, a dead microphone, a recorder left running, or a recogniser hallucination are all detected and refused rather than turned into a confident report.</li>
+  <li><strong>Accessible by design.</strong> Colour never carries meaning alone, every mark also has a glyph and an underline style so it survives greyscale printing and colour vision deficiency. Dyslexia friendly font stack, three text sizes, high contrast, full keyboard navigation.</li>
+  <li><strong>Covers K to 12.</strong> Sixty five original passages, five per grade, length scaled to what a reader at that level covers in a minute.</li>
+</ul>
+
+<h2>Limitations, stated plainly</h2>
+<ul>
+  <li><strong>It has never been tested on a child's voice.</strong> Every evaluation clip is speech synthesis, one adult voice reading faster than the 90th percentile for grade six. A seven year old at 60 words per minute with real pauses and false starts will behave differently. This is the single largest unknown in the system.</li>
+  <li><strong>The evaluation conflates two things.</strong> Against text alone the scorer recovers its own ground truth at 100% precision and 92% recall. The gap between that and the published table is Whisper on synthetic speech. The reported numbers describe the pair, not the alignment layer alone.</li>
+  <li><strong>The planted errors are the easy ones.</strong> Real child substitutions are phonologically close, like <code>house</code> and <code>horse</code>, which is exactly where a suppression stack is most likely to forgive them.</li>
+  <li><strong>Self correction recall is 40% by construction.</strong> A purely semantic self correction is indistinguishable from an added word without a language model, and there deliberately is not one.</li>
+  <li><strong>The dialect layer does not currently fire.</strong> Documented above. It is reported rather than hidden, but it is a feature that does not presently do work.</li>
+  <li><strong>Published norms stop at grade 6.</strong> Older students receive accuracy and words per minute, but any percentile refers to the passage's grade rather than their own.</li>
+  <li><strong>No persistence.</strong> Nothing is saved between sessions, so there is no progress tracking, no class view and no history. That is a deliberate privacy choice with a real usability cost.</li>
+  <li><strong>No roster integration.</strong> Students are a hardcoded list. A real deployment would need to sync from an existing system.</li>
+  <li><strong>Desktop only</strong>, 1024px and up, and Chromium based browsers for the speech model.</li>
+  <li><strong>It is a screening aid, not a validated instrument.</strong> The path to becoming one is an inter rater reliability study against certified human scorers, stratified by dialect, on at least a hundred real child readers. That is a semester of work.</li>
+</ul>
+
+<h2>Real world application</h2>
+<h3>The immediate case: universal screening without funded staff time</h3>
+<p>
+  Most US states now mandate universal early literacy screening in the primary grades. The mandate
+  rarely arrives with funded staff time to carry it out, so the work falls on classroom teachers who
+  are already teaching. ReadAloud does not remove the need for a teacher to be present, and it should
+  not be sold as though it does. What it removes is the tallying and the arithmetic, and it applies
+  identical rules to every child every time. A district gets a consistent record without buying a
+  licence and without shipping recordings of children off site.
+</p>
+<h3>Where the design matters most</h3>
+<div class="grid2">
+  <div>
+    <h4>Schools with restricted connectivity</h4>
+    <p class="muted">Rural districts and buildings with heavily filtered networks cannot rely on a
+    cloud service during a lesson. This runs with the wifi off.</p>
+    <h4>Districts with strict data policies</h4>
+    <p class="muted">Where student voice recordings cannot legally or politically leave the
+    building, an on device tool is not a preference, it is the only option available.</p>
+    <h4>Adult literacy and correctional education</h4>
+    <p class="muted">Adult learners are frequently more sensitive about being recorded than
+    children are. A tool that provably retains nothing changes what is possible in that setting.</p>
+  </div>
+  <div>
+    <h4>Progress monitoring, not just benchmarking</h4>
+    <p class="muted">A teacher who can score a read in fifteen seconds can check a struggling
+    reader weekly rather than three times a year. That is a change in what is possible, not a
+    30% efficiency gain, and it is the strongest honest claim available.</p>
+    <h4>A reference implementation for auditable assessment</h4>
+    <p class="muted">Commercial equivalents are black boxes a district cannot inspect. This is
+    readable, tested, cited scoring logic. Even where it is not deployed, it demonstrates that an
+    assessment tool can be built so that every decision it makes is explainable.</p>
+  </div>
+</div>
+
+<div class="page"></div>
+
+<h2>How to present it</h2>
+<p class="lede">
+  Build the talk around a <strong>reversal</strong>. An audience expects a pitch to escalate its
+  claims. This one retracts one, and gets stronger for it. That is what makes people pay attention.
+</p>
+<table>
+  <thead><tr><th style="width:12%">Time</th><th>What you do</th></tr></thead>
+  <tbody>
+    <tr><td><strong>0:00</strong></td><td><strong>Open on a child, not a statistic.</strong> One specific second grader who gets sixty seconds of reading assessed while a teacher makes tick marks. No slide yet. Talk to the room.</td></tr>
+    <tr><td><strong>0:20</strong></td><td><strong>Turn the wifi off, visibly, on stage.</strong> Then hand the microphone to a judge and ask them to read the passage. Say nothing at all while they read. This is the strongest twenty seconds you have and it is demonstrated rather than claimed.</td></tr>
+    <tr><td><strong>1:10</strong></td><td><strong>Point at amber.</strong> Green correct, red miscue, amber not confident enough to call it. Then click a forgiven word and count it as an error. Every number recomputes.</td></tr>
+    <tr><td><strong>1:50</strong></td><td><strong>The reversal.</strong> Introduce the dialect layer as the headline feature, then say it fired zero times. <em>Pause. Do not fill the silence.</em> Then explain why, and give the larger finding underneath it.</td></tr>
+    <tr><td><strong>2:30</strong></td><td><strong>One number.</strong> 0.48% false positives on clean reads, and why that is the metric that was optimised.</td></tr>
+    <tr><td><strong>2:45</strong></td><td><strong>Hand a judge the printed report.</strong> Physical paper at a software demo is disproportionately memorable. Then stop talking.</td></tr>
+  </tbody>
+</table>
+
+<h3>Lines worth saying exactly</h3>
+<div class="quote">"The teacher is the assessor. We are the stopwatch."</div>
+<div class="quote">"There is no language model in this product. It cannot make things up."</div>
+<div class="quote">"No API key. No account. No child's voice leaving the building."</div>
+<div class="quote">"We built a feature to protect dialect speaking children, measured whether it worked, and it fired zero times. So we published the zero."</div>
+<div class="quote">"Amber is where we are not confident enough to call it an error, so we don't."</div>
+<div class="quote">"Telling a child who read correctly that they made a mistake is the worse failure. That is the number we optimised."</div>
+<div class="quote">"It doesn't transcribe blindly. We already know what the passage says."</div>
+
+<h3>Questions you will be asked, and the answers</h3>
+<table>
+  <thead><tr><th style="width:34%">Question</th><th>Answer</th></tr></thead>
+  <tbody>
+    <tr><td>How is this different from ChatGPT?</td><td>There is no language model in it. It aligns audio against a known text and applies a rule set from the literacy assessment literature. It cannot invent anything.</td></tr>
+    <tr><td>So your main feature doesn't work?</td><td>It does not fire on this data, and we published that rather than shipping something we could not defend. What it found instead is a bias no rule table can fix, which is a more useful result.</td></tr>
+    <tr><td>Does it work on children's voices?</td><td>We do not know, and we will not pretend otherwise. Whisper is trained predominantly on adult speech. Aligning against known text helps considerably, and uncertain cases surface as amber rather than red. Testing on real children is the next step.</td></tr>
+    <tr><td>What about accents and multilingual learners?</td><td>Structurally the alignment approach absorbs a great deal of accent driven recognition error. The explicit dialect rules do not currently fire, for the reasons in the evaluation. Both statements are in our written report.</td></tr>
+    <tr><td>Could a school actually use this?</td><td>Today it is a prototype. The path to deployment is a validation study against human scorers, which is a semester of work, not a weekend.</td></tr>
+    <tr><td>Where is the AI?</td><td>A 74 million parameter speech model running locally, plus a sequence alignment algorithm, plus a rule based linguistic filter. The deterministic components were chosen deliberately: in a tool affecting a child's placement, non reproducible output is a defect.</td></tr>
+  </tbody>
+</table>
+
+<h3>Two things not to do</h3>
+<p>
+  <strong>Do not claim large time savings.</strong> The teacher still has to sit with the child. What
+  is saved is the tallying and the arithmetic, and an inflated figure invites the one question that
+  undermines the pitch. <strong>Do not cite IDEA transition planning requirements.</strong> Those
+  concern postsecondary transition at age 16 and have nothing to do with primary reading fluency.
+  Judges who know the legislation will notice, and it would cost you every other number on the slide.
+</p>
+
+<h2>Everything used to build it</h2>
+
+<h3>Application stack</h3>
+<table>
+  <thead><tr><th style="width:26%">Layer</th><th style="width:30%">Technology</th><th>Why this one</th></tr></thead>
+  <tbody>
+    <tr><td>Build tool</td><td>Vite 5.4</td><td>Fast dev server and a static production bundle. Pinned to 5 rather than 8 because the ONNX runtime bundling path is only proven there.</td></tr>
+    <tr><td>Runtime</td><td>Node 24.18 LTS</td><td>Development and the evaluation harness only. The shipped artifact is static files and needs no Node at all.</td></tr>
+    <tr><td>UI framework</td><td>React 18.3</td><td>Plain JavaScript with JSX. No TypeScript, deliberately, to avoid type errors under deadline.</td></tr>
+    <tr><td>Styling</td><td>Tailwind CSS 3.4, PostCSS, Autoprefixer</td><td>The only UI dependency in the project. No component library of any kind.</td></tr>
+    <tr><td>Concurrency</td><td>Web Workers</td><td>The speech model runs off the main thread so the interface and the input meter stay responsive during transcription.</td></tr>
+  </tbody>
+</table>
+
+<h3>Speech recognition</h3>
+<table>
+  <thead><tr><th style="width:26%">Component</th><th style="width:30%">Choice</th><th>Detail</th></tr></thead>
+  <tbody>
+    <tr><td>Library</td><td>@huggingface/transformers 3.8.1</td><td>transformers.js, the browser port of the Hugging Face pipeline API. Pinned to 3.8.1 because version 4 has an open Whisper regression.</td></tr>
+    <tr><td>Model</td><td>onnx-community/whisper-base.en_timestamped</td><td>OpenAI Whisper, English only, 74 million parameters, exported to ONNX with the alignment heads needed for word level timestamps.</td></tr>
+    <tr><td>Quantisation</td><td>8 bit (q8)</td><td>About 77MB downloaded once and cached. Full precision would be 291MB for no measurable gain.</td></tr>
+    <tr><td>Inference engine</td><td>ONNX Runtime Web</td><td>WASM backend by default. Measured roughly twice as fast as WebGPU for this workload on Apple silicon; WebGPU is available behind a flag.</td></tr>
+    <tr><td>Audio capture</td><td>getUserMedia, MediaRecorder</td><td>Echo cancellation, noise suppression and auto gain on, single channel.</td></tr>
+    <tr><td>Audio processing</td><td>Web Audio API</td><td>AudioContext resamples to the 16kHz mono Float32 the model requires. An AnalyserNode drives the live input meter from RMS amplitude.</td></tr>
+  </tbody>
+</table>
+
+<h3>Algorithms and scoring logic, all hand written</h3>
+<table>
+  <thead><tr><th style="width:26%">Algorithm</th><th>What it does here</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Needleman-Wunsch</strong></td><td>Global sequence alignment, originally from bioinformatics. Builds the full dynamic programming matrix over the passage and the transcript, then backtraces to produce an operation list. Ties are broken toward the diagonal, which biases toward calling a deviation a substitution rather than an omission plus an insertion, matching how a human marks a running record.</td></tr>
+    <tr><td><strong>Levenshtein distance</strong></td><td>Edit distance, used for the fuzzy filter and for detecting partial word self corrections. Implemented with a two row rolling buffer.</td></tr>
+    <tr><td><strong>Soundex</strong></td><td>Phonetic hashing, so words that sound alike can be recognised as recogniser noise rather than reading errors. Gated hard, because Soundex alone is far too permissive.</td></tr>
+    <tr><td><strong>Morphological lemma matching</strong></td><td>Written for this project. Detects when one word is another plus a regular inflection, so a dropped plural or tense marker can never be forgiven as a phonetic coincidence.</td></tr>
+    <tr><td><strong>Text normalisation</strong></td><td>Number to word expansion including ordinals and decimals, contraction expansion, diacritic folding, disfluency stripping, and removal of the specific phrases Whisper hallucinates onto trailing silence.</td></tr>
+    <tr><td><strong>Dialect rule engine</strong></td><td>Seven guarded phonological rules: th stopping, th fronting, postvocalic r lessness, final devoicing, consonant cluster reduction, g dropping, and metathesis. Each carries guards preventing it from erasing genuine morphology.</td></tr>
+  </tbody>
+</table>
+
+<h3>Assessment methodology, from the literature rather than invented</h3>
+<ul>
+  <li><strong>Running record conventions</strong> (Clay) for what counts as an error. Repetitions and self corrections are not errors; substitutions, omissions and insertions are.</li>
+  <li><strong>Hasbrouck &amp; Tindal 2017 ORF norms</strong> for percentile bands, transcribed digit by digit from the primary source rather than a secondary table.</li>
+  <li><strong>Instructional level bands</strong> at 95% and 90% accuracy, standard convention.</li>
+  <li><strong>Two different error counts</strong>, because words correct per minute and accuracy are defined differently. Insertions count toward accuracy following Clay, but not toward the rate, because the norm setting procedure does not score them.</li>
+</ul>
+
+<h3>Testing and evaluation</h3>
+<table>
+  <thead><tr><th style="width:26%">Tool</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td>Vitest</td><td>77 unit tests over the scoring engine, including a purpose written adversarial suite that attempts to make the suppression filters erase real reading errors.</td></tr>
+    <tr><td>Custom evaluation harness</td><td>Renders stimulus audio, transcribes it with the real model, scores it, and compares against constructed ground truth. Emits precision, recall and F1 per miscue type plus per filter firing counts.</td></tr>
+    <tr><td>macOS <code>say</code> and <code>afconvert</code></td><td>Generates the evaluation stimulus as deterministic 16kHz mono WAV, so a rerun is directly comparable to the previous run.</td></tr>
+    <tr><td>Chrome DevTools Protocol</td><td>Headless Chrome driven over CDP to verify the app in a real browser: console errors, element overflow measurement, and the full record to score flow.</td></tr>
+    <tr><td>Network tracing</td><td>The offline claim was verified by loading the production build with every external host blocked and confirming zero outbound requests during a complete assessment.</td></tr>
+    <tr><td>Multi agent review</td><td>Four independent review passes over the codebase: architecture, security and infrastructure, strategic critique, and adversarial red teaming. Findings from all four are reflected in the current build.</td></tr>
+  </tbody>
+</table>
+
+<h3>Accessibility implementation</h3>
+<ul>
+  <li>WCAG AA contrast throughout, and colour never used as the sole carrier of meaning. Every marked word also has a glyph and a distinct underline style.</li>
+  <li>Semantic HTML with correct heading order, ARIA landmarks, and <code>aria-describedby</code> on every marked word so a screen reader announces the explanation on focus.</li>
+  <li>Dyslexia friendly typography as a <strong>font stack</strong> rather than a downloaded webfont, so the accessibility toggle keeps working with no network.</li>
+  <li>Three text sizes, high contrast mode, complete keyboard navigation, visible focus rings, and <code>prefers-reduced-motion</code> honoured.</li>
+  <li>A dedicated print stylesheet producing a one page record that survives a monochrome printer.</li>
+</ul>
+
+<h3>Tooling around the project</h3>
+<ul>
+  <li><strong>Git and GitHub</strong> via the <code>gh</code> CLI for version control and publication.</li>
+  <li><strong>Documentation</strong> in Markdown, with PDF versions rendered through headless Chrome.</li>
+  <li><strong>Presentation deck</strong> built as a self contained HTML file with CSS animation, exported to PDF, and generated as a genuine PowerPoint file using <code>python-pptx</code> with entrance animations written directly into the OOXML timing tree, since that library has no animation API.</li>
+  <li><strong>Narration</strong> for the video generated with the ElevenLabs text to speech API.</li>
+  <li><strong>Video</strong> composed in Remotion, which renders React components to MP4 through headless Chrome and ffmpeg.</li>
+</ul>
+
+<h3>What is deliberately absent</h3>
+<p>
+  No backend of any kind. No database. No authentication. No analytics or telemetry. No language
+  model. No component library. No CSS framework beyond Tailwind. No state management library. No
+  router. No webfonts. No content delivery network at runtime. Every one of those omissions is a
+  decision rather than an oversight, and each removes a failure mode from a tool that has to work
+  in a classroom with no network and no technician.
+</p>
+
+<h2>Technical summary</h2>
+<div>
+  <span class="pill">React 18</span><span class="pill">Vite 5</span><span class="pill">Plain JavaScript</span>
+  <span class="pill">Tailwind</span><span class="pill">Whisper via transformers.js</span>
+  <span class="pill">Needleman-Wunsch</span><span class="pill">Vitest</span>
+  <span class="pill a">No server</span><span class="pill a">No database</span><span class="pill a">No API key</span>
+  <span class="pill a">No language model</span><span class="pill a">No accounts</span>
+</div>
+<p style="margin-top:6pt" class="muted">
+  Whisper <code>base.en</code> quantised to 8 bit, running in a Web Worker so the interface stays
+  responsive. WASM by default, which measured roughly twice as fast as WebGPU for this workload on
+  Apple silicon. 77 automated tests covering the scoring engine, including an adversarial suite
+  written specifically to break the suppression filters. A reproducible evaluation harness with
+  committed results and a smoke test that exercises the real model.
+</p>
+
+<footer>
+  <strong>Sources.</strong> Hasbrouck, J., &amp; Tindal, G. (2017), <em>An update to compiled ORF norms</em>,
+  Technical Report 1702, University of Oregon · Fuchs, Fuchs, Hosp &amp; Jenkins (2001),
+  <em>Scientific Studies of Reading</em> 5(3) · Labov &amp; Baker (2010), <em>Applied Psycholinguistics</em> 31(4) ·
+  Charity, Scarborough &amp; Griffin (2004), <em>Child Development</em> 75(5) · Goodman &amp; Buck (1973),
+  <em>The Reading Teacher</em> 27(1) · Koenecke et al. (2020), <em>PNAS</em> 117(14).
+</footer>
+
+</body>
+</html>
