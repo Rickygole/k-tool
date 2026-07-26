@@ -79,7 +79,15 @@ export function numberToWords(n) {
  * a person actually reads them aloud.
  */
 export function expandNumbers(text) {
-  return text.replace(/\d+/g, (digits) => {
+  return text
+    // Thousands separators first, so "1,000" becomes one number rather than "one" + "zero".
+    .replace(/(\d),(?=\d{3}\b)/g, '$1')
+    // Ordinals. "1st" was expanding to "onest".
+    .replace(/\b(\d+)(st|nd|rd|th)\b/gi, (_, n) => ordinalToWords(Number(n)))
+    // Decimals. "3.14" was expanding to "threefourteen".
+    .replace(/\b(\d+)\.(\d+)\b/g, (_, a, b) =>
+      `${numberToWords(Number(a))} point ${String(b).split('').map((d) => ONES[Number(d)]).join(' ')}`)
+    .replace(/\d+/g, (digits) => {
     const n = Number(digits)
     if (!Number.isFinite(n)) return digits
     if (digits.length === 4 && n >= 1100 && n <= 1999) {
@@ -89,8 +97,23 @@ export function expandNumbers(text) {
       if (lo < 10) return `${numberToWords(hi)} oh ${numberToWords(lo)}`
       return `${numberToWords(hi)} ${numberToWords(lo)}`
     }
-    return numberToWords(n)
-  })
+      return numberToWords(n)
+    })
+}
+
+const ORDINAL_IRREGULAR = {
+  one: 'first', two: 'second', three: 'third', five: 'fifth', eight: 'eighth',
+  nine: 'ninth', twelve: 'twelfth',
+}
+
+/** "1st" -> "first", "21st" -> "twenty first". */
+export function ordinalToWords(n) {
+  const words = numberToWords(n).split(' ')
+  const last = words[words.length - 1]
+  if (ORDINAL_IRREGULAR[last]) words[words.length - 1] = ORDINAL_IRREGULAR[last]
+  else if (last.endsWith('y')) words[words.length - 1] = `${last.slice(0, -1)}ieth`
+  else words[words.length - 1] = `${last}th`
+  return words.join(' ')
 }
 
 /**
@@ -104,6 +127,12 @@ export function normalizeToken(raw) {
     .toLowerCase()
     .replace(/[‘’ʼ]/g, "'")
     .replace(/[–—]/g, '-')
+    // Fold diacritics rather than deleting them. Stripping non-ASCII turned "café" into "caf"
+    // and "piñata" into "piata" -- silently, so a passage containing an ordinary loanword (both
+    // are common in elementary readers) would mis-score with no warning to the teacher.
+    // NFD splits the base letter from its accent; the range strips only the accent.
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
     // Drop anything that isn't a letter, digit, apostrophe or internal hyphen.
     .replace(/[^a-z0-9'-]/g, '')
     // Now strip apostrophes/hyphens that ended up leading or trailing (quotes, dashes).
@@ -121,8 +150,61 @@ export function normalizeToken(raw) {
  * @param {{isHypothesis?: boolean}} [opts]
  * @returns {{original: string[], normalized: string[]}}
  */
+/**
+ * Whisper's trailing hallucinations, stripped from the END of a transcript.
+ *
+ * On trailing silence Whisper emits phrases from its training distribution -- it was trained on
+ * a great deal of YouTube, and the outro is the most predictable thing in that corpus. A child
+ * who finishes reading and sits quietly for three seconds reliably produces one of these.
+ *
+ * Unhandled, they score as insertions: "Thank you. Thanks for watching!" costs five errors and
+ * drops a perfect read to 50% accuracy at frustration level. The list is finite and well known,
+ * and matching it only at the end of the transcript keeps a child who genuinely reads the words
+ * "thank you" in a passage from being silently edited.
+ */
+const TRAILING_HALLUCINATIONS = [
+  'thanks for watching',
+  'thank you for watching',
+  'thanks for watching!',
+  'thank you',
+  'please subscribe',
+  'subtitles by the amara.org community',
+  'subtitles by',
+  'bye',
+  'you',
+]
+
+export function stripTrailingHallucination(text) {
+  let out = (text ?? '').trim()
+  // Loop: Whisper often emits two in a row ("Thank you. Thanks for watching!").
+  for (let pass = 0; pass < 4; pass++) {
+    const before = out
+    for (const phrase of TRAILING_HALLUCINATIONS) {
+      const re = new RegExp(`[\\s.,!?]*${phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s.,!?]*$`, 'i')
+      if (re.test(out)) {
+        out = out.replace(re, '').trim()
+        break
+      }
+    }
+    if (out === before) break
+  }
+  return out
+}
+
 export function tokenize(text, opts = {}) {
-  const expanded = expandNumbers(text ?? '')
+  // Running words, counted the way a human scorer counts them: whitespace-separated units of
+  // the text as printed. "doesn't" is one word and "ice-cream" is one word to a teacher, even
+  // though both are split below so the aligner can match them against whatever Whisper wrote.
+  //
+  // This distinction is not cosmetic. `runningWords` is the WCPM denominator and the accuracy
+  // denominator; using the post-expansion token count instead inflates both, and a passage full
+  // of contractions would report a materially wrong fluency score.
+  // String() rather than `?? ''`: a caller passing a number, or a passage field that came back
+  // null from a data file, must not take the app down inside a scoring call.
+  const src = typeof text === 'string' ? text : text == null ? '' : String(text)
+  const runningWords = src.trim() ? src.trim().split(/\s+/).filter((t) => /[a-z0-9]/i.test(t)).length : 0
+
+  const expanded = expandNumbers(src)
 
   // Hyphens separate words for reading purposes. A child reading "sixty-five" says two words,
   // and Whisper writes two words -- so without this split every hyphenated compound in the
@@ -154,7 +236,7 @@ export function tokenize(text, opts = {}) {
     normalized.push(norm)
   }
 
-  return { original, normalized }
+  return { original, normalized, runningWords }
 }
 
 /** Expanded form of a contraction, or null. Used by the match relaxation pass. */

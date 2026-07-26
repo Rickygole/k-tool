@@ -70,6 +70,12 @@ export function createRecorder() {
 
   return {
     async start() {
+      // Reentrancy guard. A double-click on Record used to leak the previous MediaStream --
+      // leaving the browser's mic indicator lit, which is very visible on a projector -- and
+      // the previous meter AudioContext, and Chrome caps AudioContexts per page, so a few
+      // repeated reads in one session would stop the recorder working at all.
+      if (recorder) return
+
       stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
@@ -111,20 +117,33 @@ export function createRecorder() {
     },
 
     async stop() {
-      if (!recorder) throw new Error('stop() before start()')
+      // Returns null rather than throwing on a second call. MediaRecorder.stop() on an
+      // already-inactive recorder raises InvalidStateError, and a double-tapped stop button is
+      // an ordinary thing for a person to do -- it should not surface as an exception the UI
+      // has to catch.
+      if (!recorder) return null
+
+      const active = recorder
+      recorder = null // claim it first, so a concurrent stop() cannot re-enter
 
       const blob = await new Promise((resolve) => {
-        recorder.onstop = () => resolve(new Blob(chunks, { type: recorder.mimeType }))
-        recorder.stop()
+        active.onstop = () => resolve(new Blob(chunks, { type: active.mimeType }))
+        active.stop()
         stoppedAt = performance.now()
       })
 
-      stream.getTracks().forEach((t) => t.stop())
+      stream?.getTracks().forEach((t) => t.stop())
       if (meterCtx) meterCtx.close()
+      stream = null
       analyser = null
       meterCtx = null
 
       return { blob, durationSec: (stoppedAt - startedAt) / 1000 }
+    },
+
+    /** True while a recording is in progress. Lets the UI disable its own buttons honestly. */
+    isRecording() {
+      return recorder !== null
     },
 
     elapsedSec() {

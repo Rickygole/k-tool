@@ -163,6 +163,10 @@ body {
      an underline style and a glyph, both of which survive greyscale printing and colour
      vision deficiency. */
   .word {
+    /* <mark> carries a yellow highlight in every UA stylesheet and Tailwind's preflight does
+       not reset it. Without this, a self-correction would render on a browser-default yellow
+       that means nothing in our scheme and clashes with the amber that means something. */
+    background-color: transparent;
     @apply rounded px-0.5;
     text-underline-offset: 0.22em;
   }
@@ -221,9 +225,22 @@ body {
     @apply opacity-100;
   }
 
+  /* Standalone figures use the UI sans and the font's PROPORTIONAL digits. tabular-nums gives
+     every digit the width of a zero, which looks visibly loose at display sizes -- it belongs
+     in the miscue table where columns of numbers must line up, and nowhere else. */
+  .hero-value {
+    font-family: var(--ra-font-ui);
+    font-size: 3.25rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    @apply leading-none;
+  }
   .metric-value {
-    @apply font-display tabular-nums leading-none;
-    font-size: 2.25rem;
+    font-family: var(--ra-font-ui);
+    font-size: 1.875rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    @apply leading-none;
   }
   .field-label {
     color: var(--ra-muted);

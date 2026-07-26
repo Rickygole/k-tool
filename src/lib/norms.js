@@ -43,13 +43,27 @@ export const CITATION =
 export function percentileBand(wcpm, grade, season = 'spring') {
   const row = ORF_NORMS[grade]
   const idx = SEASON_INDEX[season]
-  if (!row || idx === undefined) return null
+  // null means "no published norms for this grade/season" -- H&T 2017 covers grades 1-6 only,
+  // so grade 7+ and kindergarten legitimately have no answer and must not be given one.
+  if (!row || idx === undefined || !Number.isFinite(wcpm)) return null
 
-  for (const p of [90, 75, 50, 25]) {
+  for (const p of [90, 75, 50, 25, 10]) {
     const target = row[p]?.[idx]
     if (target != null && wcpm >= target) return p
   }
-  return row[10]?.[idx] == null ? null : 10
+  // Below the published 10th percentile is NOT the 10th percentile. A grade-6 reader at 5 WCPM
+  // against a 91 WCPM floor is off the bottom of the table, and reporting them as "10th
+  // percentile" overstates them enormously -- in the direction that lets a struggling reader go
+  // unnoticed, which is the worst direction for this tool to be wrong in.
+  //
+  // 'below_10' is a distinct value rather than null, because null already means "this grade has
+  // no published norms" and those are different statements a teacher needs told apart.
+  return 'below_10'
+}
+
+/** Does the published table cover this grade at all? H&T 2017 is grades 1-6 only. */
+export function hasNorms(grade, season = 'spring') {
+  return ORF_NORMS[grade]?.[50]?.[SEASON_INDEX[season]] != null
 }
 
 /** The 50th-percentile benchmark, for "typical for this grade is N WCPM" copy. */
@@ -63,6 +77,10 @@ export function medianWcpm(grade, season = 'spring') {
  * just stay consistent with whatever the report prints.
  */
 export function instructionalLevel(accuracyPct) {
+  // NaN falls through every comparison, so a naive chain returns the LAST branch -- meaning a
+  // missing accuracy silently reported "frustration", the most consequential label the tool
+  // can attach to a child. Absent data must read as absent.
+  if (!Number.isFinite(accuracyPct)) return null
   if (accuracyPct >= 95) return 'independent'
   if (accuracyPct >= 90) return 'instructional'
   return 'frustration'

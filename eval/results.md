@@ -12,7 +12,7 @@
 | Metric | Value |
 |---|---|
 | **False positive rate on clean reads** | **0.48%** (2 flags / 421 words) |
-| Mean absolute WCPM error | 1.0 WCPM |
+| Mean absolute WCPM error | 0.4 WCPM |
 | Passages evaluated | 5 |
 | Planted miscues | 50 |
 
@@ -25,8 +25,8 @@ layer is doing nothing on this data and we say so rather than implying otherwise
 |---|---|
 | dialect | 0 |
 | homophone | 1 |
-| fuzzy | 2 |
-| phonetic | 4 |
+| fuzzy | 0 |
+| phonetic | 6 |
 | contraction | 0 |
 
 ## Per-passage
@@ -34,7 +34,7 @@ layer is doing nothing on this data and we say so rather than implying otherwise
 | Passage | Grade | Words | Clean FP | Clean accuracy | WCPM reported / true |
 |---|---|---|---|---|---|
 | fox | 2 | 85 | 0 | 100% | 216 / 216 |
-| bridge | 3 | 83 | 2 | 97.6% | 193 / 198 |
+| bridge | 3 | 83 | 2 | 97.6% | 196 / 198 |
 | garden | 3 | 83 | 0 | 100% | 193 / 193 |
 | whale | 4 | 84 | 0 | 100% | 178 / 178 |
 | letter | 4 | 86 | 0 | 100% | 204 / 204 |

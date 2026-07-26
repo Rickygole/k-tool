@@ -7,6 +7,8 @@
  * false suppressions, the fix is to tighten the gate below, not to swap the algorithm.
  */
 
+import { bothCommon } from './lexicon.js'
+
 const CODES = {
   b: '1', f: '1', p: '1', v: '1',
   c: '2', g: '2', j: '2', k: '2', q: '2', s: '2', x: '2', z: '2',
@@ -55,6 +57,13 @@ export function soundex(word) {
  */
 export function phoneticMatch(a, b) {
   if (!a || !b) return false
+
+  // Two ordinary English words that happen to share a Soundex key are a coincidence, not
+  // evidence. Soundex maps d and t to the same code, so "bad"/"bat", "bed"/"bet", "sad"/"sat",
+  // "hard"/"heart" were all being forgiven as phonetic near-misses. Those are exactly the
+  // first-grade decoding errors a running record exists to catch.
+  if (bothCommon(a, b)) return false
+
   if (Math.abs(a.length - b.length) > 2) return false
   if (a[0] !== b[0]) return false
   return soundex(a) === soundex(b)

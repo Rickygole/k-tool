@@ -75,15 +75,18 @@ describe('score() — the ten cases', () => {
   })
 
   it('7. substitution suppressed by fuzzy match', () => {
-    // "lived" -> "lives": similarity 0.8... below threshold. "woods" -> "wood" is 0.8 too.
-    // Use a true ASR-style near-miss: "edge" -> "edges" (0.8) is too low, so test "little" ->
-    // "littles" (6/7 = 0.857), which is exactly the morphological near-miss this filter is for.
-    const r = score(PASSAGE, asr('The littles fox lived at the edge of the woods'))
+    // At the 0.9 threshold the filter only forgives long words with a single edit -- which is
+    // what ASR spelling variance actually looks like. "littles" for "little" is 0.857 and is
+    // now correctly scored as an error: a child who added a plural read the word wrong.
+    const r = score('the restaurant opened', asr('the restaurent opened'))
     expect(r.metrics.errors).toBe(0)
     const t = r.tokens.find((x) => x.suppressedBy === 'fuzzy')
     expect(t).toBeDefined()
     expect(t.status).toBe('correct')
     expect(r.suppressionCounts.fuzzy).toBe(1)
+
+    // And the pair the threshold was raised to catch is now an error, not an amnesty.
+    expect(score('the country road', asr('the county road')).metrics.errors).toBe(1)
   })
 
   it('8. homophone is never flagged', () => {
@@ -161,7 +164,10 @@ describe('the bugs the spec shipped with', () => {
     expect(percentileBand(200, 4, 'spring')).toBe(90)
     expect(percentileBand(133, 4, 'spring')).toBe(50)
     expect(percentileBand(132, 4, 'spring')).toBe(25)
-    expect(percentileBand(50, 4, 'spring')).toBe(10)
+    // Below the published 10th percentile is a distinct answer from "the 10th percentile".
+    expect(percentileBand(94, 4, 'spring')).toBe(10)
+    expect(percentileBand(50, 4, 'spring')).toBe('below_10')
+    expect(percentileBand(120, 7, 'spring'), 'H&T 2017 has no grade 7').toBeNull()
   })
 })
 
@@ -257,5 +263,101 @@ describe('metrics arithmetic', () => {
     const after = score(PASSAGE, hyp, { overrides: { [flagged.refIndex]: true } })
     expect(after.metrics.errors).toBe(0)
     expect(after.metrics.accuracyPct).toBe(100)
+  })
+})
+
+describe('hardening — findings from the review gate', () => {
+  it('never throws on a null or malformed ASR result', () => {
+    // A raw TypeError here takes the React tree down to a white screen mid-demo.
+    expect(() => score(PASSAGE, null)).not.toThrow()
+    expect(() => score(PASSAGE, undefined)).not.toThrow()
+    expect(() => score(PASSAGE, {})).not.toThrow()
+    expect(() => score('', asr(''))).not.toThrow()
+  })
+
+  it('refuses to score a silent recording instead of inventing a report', () => {
+    // A dead mic returns silence, and silence aligns as "every word omitted" -- which rendered
+    // a confident, printable running record for a child who never spoke.
+    const silent = score(PASSAGE, { text: '', words: [], durationSec: 60 })
+    expect(silent.validity.ok).toBe(false)
+    expect(silent.validity.reason).toBe('no_speech')
+
+    const clipped = score(PASSAGE, asr('The', 60))
+    expect(clipped.validity.ok).toBe(false)
+    expect(clipped.validity.reason).toBe('mostly_silent')
+
+    const stubby = score(PASSAGE, asr(PASSAGE, 0.4))
+    expect(stubby.validity.ok).toBe(false)
+    expect(stubby.validity.reason).toBe('too_short')
+
+    expect(score(PASSAGE, asr(PASSAGE)).validity.ok).toBe(true)
+  })
+
+  it('cannot report a physically impossible WCPM', () => {
+    // A double-tapped stop button reported 600,000 WCPM at the 90th percentile. Now the read is
+    // refused outright and carries no verdict at all -- null, not a smaller wrong number.
+    for (const d of [0.001, 0.5, 1.9, 0]) {
+      const m = score(PASSAGE, asr(PASSAGE, d)).metrics
+      expect(m.scoreable).toBe(false)
+      expect(m.wcpm).toBeNull()
+      expect(m.level).toBeNull()
+      expect(m.percentile).toBeNull()
+    }
+  })
+
+  it('an unscoreable read carries no verdict a UI could render', () => {
+    // Whisper's two commonest failures both produce EXCESS output: a repetition loop on poor
+    // audio, and "Thanks for watching!" hallucinated onto trailing silence. Both used to turn a
+    // perfect read into 0% accuracy at frustration level, reported confidently.
+    const loop = score(PASSAGE, asr(`${PASSAGE} ${Array(60).fill('woods').join(' ')}`))
+    expect(loop.validity.ok).toBe(false)
+    expect(loop.validity.reason).toBe('transcript_too_long')
+    expect(loop.metrics.accuracyPct).toBeNull()
+    expect(loop.metrics.level).toBeNull()
+
+    const hallucination = score(PASSAGE, asr(`${PASSAGE} Thank you. Thanks for watching!`))
+    expect(hallucination.metrics.level).not.toBe('frustration')
+
+    const readTwice = score(PASSAGE, asr(`${PASSAGE} ${PASSAGE}`))
+    expect(readTwice.validity.ok).toBe(false)
+  })
+
+  it('does not forgive real minimal pairs as dialect variation', () => {
+    // Each of these is a plain decoding error that the phonological rules used to erase.
+    const pairs = [
+      ['thing', 'thin'], ['sing', 'sin'], ['wing', 'win'],
+      ['bad', 'bat'], ['her', 'he'], ['your', 'you'], ['cold', 'coal'],
+    ]
+    for (const [ref, hyp] of pairs) {
+      const r = score(`the ${ref} came`, asr(`the ${hyp} came`))
+      expect(r.metrics.errors, `"${ref}" read as "${hyp}" must be scored`).toBe(1)
+    }
+  })
+
+  it('still forgives genuine dialect variants after that guard', () => {
+    const r = score('this cold morning I ask for four running dogs',
+      asr('dis col morning I aks for fo runnin dogs'))
+    expect(r.metrics.errors).toBe(0)
+    expect(r.suppressionCounts.dialect).toBeGreaterThanOrEqual(5)
+  })
+
+  it('folds diacritics instead of deleting them', () => {
+    // "café" was becoming "caf" and "piñata" "piata" -- silently mis-scoring loanwords that
+    // appear routinely in elementary readers.
+    const r = score('we ate at the café near the piñata', asr('we ate at the cafe near the pinata'))
+    expect(r.metrics.errors).toBe(0)
+  })
+
+  it('survives pathological input without hanging or returning NaN', () => {
+    // 300 repetitions of one word is not a read; it is refused rather than scored.
+    const long = score('the fox ran', asr(Array(300).fill('fox').join(' ')))
+    expect(long.validity.ok).toBe(false)
+    expect(long.metrics.accuracyPct).toBeNull()
+
+    const emoji = score('the fox ran', asr('🦊 🦊 🦊'))
+    expect(emoji.metrics.accuracyPct === null || Number.isFinite(emoji.metrics.accuracyPct)).toBe(true)
+
+    const oneWord = score('fox', asr('fox'))
+    expect(oneWord.metrics.accuracyPct).toBe(100)
   })
 })

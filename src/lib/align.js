@@ -23,9 +23,18 @@ export const GAP = -1
  * @param {string[]} hyp
  * @returns {AlignOp[]} operations in reference order
  */
+// A 100-word passage against a 100-word transcript is a 10k-cell matrix -- free. A pasted
+// chapter against a Whisper repetition loop is not: the DP matrix is O(m*n) Int32 cells, so
+// 12000x12000 is ~576MB and takes the tab down with it.
+//
+// 1200 caps the matrix at ~5.8MB. Nothing legitimate here comes close: ORF passages run 60-250
+// words and the norms are built on one-minute reads. Truncating is the right failure -- an
+// input this size is already not a reading assessment.
+export const MAX_TOKENS = 1200
+
 export function align(ref, hyp) {
-  const m = ref.length
-  const n = hyp.length
+  const m = Math.min(ref.length, MAX_TOKENS)
+  const n = Math.min(hyp.length, MAX_TOKENS)
 
   // score[i][j] = best score aligning ref[0..i) against hyp[0..j)
   const score = Array.from({ length: m + 1 }, () => new Int32Array(n + 1))

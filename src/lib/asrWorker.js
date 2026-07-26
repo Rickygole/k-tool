@@ -4,26 +4,31 @@
  *
  * Protocol -- main thread posts:
  *   { type: 'load',       device?: 'wasm'|'webgpu', modelId?: string }
- *   { type: 'transcribe', audio: Float32Array (16kHz mono), returnTimestamps?: boolean }
+ *   { type: 'transcribe', audio: Float32Array (16kHz mono), durationSec, returnTimestamps? }
  * Worker posts back:
  *   { type: 'progress', file, progress, loaded, total }
  *   { type: 'ready',    device, modelId, loadMs }
- *   { type: 'result',   text, words: AsrWord[], asrMs }
+ *   { type: 'result',   text, words: AsrWord[], durationSec, asrMs }
  *   { type: 'error',    message, stage }
+ *
+ * Every option this file uses comes from asrOptions.js, shared with the smoke test and the
+ * eval harness. Do not inline options here -- that divergence is what let a fatal bug sit
+ * behind a green test suite.
  */
-import { pipeline } from '@huggingface/transformers'
+import { pipeline, env } from '@huggingface/transformers'
+import { MODEL_ID, PER_DEVICE_CONFIG, transcribeOptions, toAsrResult } from './asrOptions.js'
 
-// Per-module dtype, not a flat string. A flat `fp32` costs ~291MB of cold download for zero
-// speed gain; this split is what HF's own whisper-word-timestamps example ships.
-// Never set fp16 on the encoder -- it is broken upstream (transformers.js#894).
-const PER_DEVICE_CONFIG = {
-  webgpu: { device: 'webgpu', dtype: { encoder_model: 'fp32', decoder_model_merged: 'q4' } },
-  wasm: { device: 'wasm', dtype: 'q8' },
-}
-
-// English-only + timestamp-capable. 77MB at q8. `tiny.en_timestamped` (41MB) is the
-// wifi-hostile fallback; swap MODEL_ID via the 'load' message rather than editing this.
-const DEFAULT_MODEL_ID = 'onnx-community/whisper-base.en_timestamped'
+// transformers.js unconditionally points onnxruntime-web's WASM loader at
+// https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/dist/ during its own init, and
+// does so BEFORE onnxruntime's "use the locally bundled asset" branch can run (that branch only
+// fires when wasmPaths is unset). Vite emits the .wasm into our own output and it then goes
+// unused, so the running app quietly depends on a third CDN nobody mentioned.
+//
+// That matters beyond tidiness: "nothing leaves the building, works offline" is a claim this
+// project makes out loud about a tool handling children's voices. Pointing this back at our own
+// origin makes the claim literally true and removes a domain a school filter is likely to block.
+// scripts/vendor-ort.mjs puts the files there; it runs on predev and prebuild.
+env.backends.onnx.wasm.wasmPaths = '/'
 
 let pipe = null
 let loadedWith = null
@@ -38,10 +43,10 @@ async function getPipeline(device, modelId, onProgress) {
   })
   loadedWith = key
 
-  // WebGPU compiles shaders on first real inference (~2-4s). Burn that cost during load
-  // rather than in front of a judge. One second of silence is enough to trigger it.
+  // WebGPU compiles shaders on first real inference (~2-4s). Burn that cost during load rather
+  // than in front of a judge. One second of silence is enough to trigger it.
   if (device === 'webgpu') {
-    await pipe(new Float32Array(16000), { language: 'en' })
+    await pipe(new Float32Array(16000), transcribeOptions({ returnTimestamps: false }))
   }
   return pipe
 }
@@ -52,7 +57,7 @@ self.addEventListener('message', async (event) => {
   try {
     if (msg.type === 'load') {
       const device = msg.device || 'wasm'
-      const modelId = msg.modelId || DEFAULT_MODEL_ID
+      const modelId = msg.modelId || MODEL_ID
       const t0 = performance.now()
       await getPipeline(device, modelId, (p) => {
         if (p.status === 'progress') {
@@ -71,19 +76,15 @@ self.addEventListener('message', async (event) => {
 
     if (msg.type === 'transcribe') {
       if (!pipe) throw new Error('transcribe called before load')
-      const returnTimestamps = msg.returnTimestamps !== false
 
       const t0 = performance.now()
-      // stride_length_s is deliberately omitted -- it defaults to chunk_length_s / 6 = 5,
-      // and passing both risks the `chunk_length_s > stride_length_s` throw for no benefit.
-      const out = await pipe(msg.audio, {
-        language: 'en',
-        return_timestamps: returnTimestamps ? 'word' : false,
-        chunk_length_s: 30,
-      })
+      const out = await pipe(
+        msg.audio,
+        transcribeOptions({ returnTimestamps: msg.returnTimestamps !== false }),
+      )
       const asrMs = Math.round(performance.now() - t0)
 
-      self.postMessage({ type: 'result', ...toAsrResult(out), asrMs })
+      self.postMessage({ type: 'result', ...toAsrResult(out, msg.durationSec), asrMs })
       return
     }
   } catch (err) {
@@ -94,35 +95,3 @@ self.addEventListener('message', async (event) => {
     })
   }
 })
-
-/**
- * Normalise whisper output into the AsrResult word list the scorer expects.
- *
- * Every chunk.text comes back with a LEADING SPACE (" And", " so", ...). Failing to trim it
- * makes every single token mismatch during alignment, which presents as a scorer that thinks
- * a perfect read is 100% errors. This trim is the whole reason this function exists.
- */
-function toAsrResult(out) {
-  const text = (out?.text ?? '').trim()
-
-  if (Array.isArray(out?.chunks) && out.chunks.length > 0) {
-    const words = out.chunks
-      .map((c) => ({
-        word: (c.text ?? '').trim(),
-        start: Array.isArray(c.timestamp) ? c.timestamp[0] : undefined,
-        end: Array.isArray(c.timestamp) ? c.timestamp[1] : undefined,
-      }))
-      .filter((w) => w.word.length > 0)
-    return { text, words }
-  }
-
-  // No chunks -- either return_timestamps was off or the ONNX export lacks alignment heads.
-  // Callers interpolate timestamps from durationSec. ADR-4: this costs polish, not product.
-  return {
-    text,
-    words: text
-      .split(/\s+/)
-      .filter(Boolean)
-      .map((word) => ({ word })),
-  }
-}

@@ -6,13 +6,17 @@
  * and it is the only part of the codebase worth unit testing.
  */
 import { align, similarity } from './align.js'
-import { tokenize, expandContraction } from './normalize.js'
+import { tokenize, expandContraction, stripTrailingHallucination } from './normalize.js'
 import { dialectMatch, isCopulaOmission } from './dialect.js'
 import { phoneticMatch } from './phonetic.js'
 import { isHomophone } from './homophones.js'
+import { bothCommon } from './lexicon.js'
 import { instructionalLevel, percentileBand } from './norms.js'
 
-const FUZZY_THRESHOLD = 0.85
+// 0.9, not the spec's 0.85. At 0.85 every 7-letter one-edit pair passes at HIGH confidence --
+// `country`/`county`, `desert`/`dessert`, `through`/`though` -- and those are real substitutions
+// a running record exists to record, not ASR spelling noise.
+const FUZZY_THRESHOLD = 0.9
 
 /**
  * @typedef {Object} ScoredToken
@@ -36,6 +40,35 @@ function relaxMismatch(refWord, hypWord, options) {
     return { suppressedBy: 'contraction', confidence: 'high', dialectRules: [] }
   }
 
+  // ══════════════════════════════════════════════════════════════════════════════════════
+  // THE GATE. This runs above ALL four filters, and it is the most important line in the file.
+  //
+  // Every filter below is approximate, and each one independently zeroes the error. Gating
+  // only one of them just moves the label: when the dialect layer stopped forgiving `bad`/`bat`
+  // and `thing`/`thin`, Soundex picked them up instead and the error count did not move. An
+  // adversarial sweep of a 471-word K-3 lexicon found 116 distinct real-word pairs the stack
+  // forgave -- `house`/`horse`, `from`/`form`, `her`/`he`, `food`/`foot`.
+  //
+  // That inverts the entire premise of the product. The pitch is that we protect dialect-
+  // speaking children from being mis-scored; the behaviour was that we hid genuine decoding
+  // errors, and hid them most for the children the rules were written for. A child who cannot
+  // decode `house` was scored 100% and never referred for intervention.
+  //
+  // So: if both words are ordinary English, this is a reading event and nothing may forgive it.
+  //
+  // HOMOPHONES ARE THE ONE EXEMPTION, and they are checked first, above the gate. Nearly every
+  // homophone pair is two ordinary words -- see/sea, sun/son, there/their -- so the gate would
+  // otherwise swallow the entire table. The exemption is safe because homophony is a fact about
+  // acoustics rather than an approximation: no recogniser can tell these apart from audio, and
+  // neither could the human scorer we are standing in for. Flagging one would be reporting a
+  // decoding error we have no evidence for.
+  // ══════════════════════════════════════════════════════════════════════════════════════
+  if (isHomophone(refWord, hypWord)) {
+    return { suppressedBy: 'homophone', confidence: 'high', dialectRules: [] }
+  }
+
+  if (bothCommon(refWord, hypWord)) return null
+
   // ORDERING NOTE. The spec ran these fuzzy -> phonetic -> homophone -> dialect. That order is
   // wrong twice over, and both errors are invisible in the pass/fail totals because the word
   // still gets suppressed either way -- what changes is the REASON we show the teacher, and
@@ -49,7 +82,8 @@ function relaxMismatch(refWord, hypWord, options) {
   //     every homophone pair shares a Soundex key -- and stamped those words confidence 'low'
   //     when they deserve 'high'. "see"/"sea" is not an uncertain call.
   //
-  // Most specific explanation wins. Order is now: dialect, homophone, fuzzy, phonetic.
+  // Most specific explanation wins. Order is now: homophone (above the gate), dialect,
+  // fuzzy, phonetic.
 
   // 1. Dialect. Narrow, guarded, and the most informative thing we can tell a teacher.
   if (options.dialectLayer !== false) {
@@ -59,18 +93,12 @@ function relaxMismatch(refWord, hypWord, options) {
     }
   }
 
-  // 2. Homophones. Acoustically indistinguishable -- a human scorer could not call these
-  // either, so this is high confidence, not a hedge.
-  if (isHomophone(refWord, hypWord)) {
-    return { suppressedBy: 'homophone', confidence: 'high', dialectRules: [] }
-  }
-
-  // 3. Fuzzy. ASR spelling variance and morphological near-misses.
+  // 2. Fuzzy. ASR spelling variance and morphological near-misses.
   if (similarity(refWord, hypWord) >= FUZZY_THRESHOLD) {
     return { suppressedBy: 'fuzzy', confidence: 'high', dialectRules: [] }
   }
 
-  // 4. Phonetic. Low confidence by construction -- surfaced amber, never counted as confident.
+  // 3. Phonetic. Low confidence by construction -- surfaced amber, never counted as confident.
   if (phoneticMatch(refWord, hypWord)) {
     return { suppressedBy: 'phonetic', confidence: 'low', dialectRules: [] }
   }
@@ -89,11 +117,20 @@ function relaxMismatch(refWord, hypWord, options) {
 export function score(referenceText, asrResult, options = {}) {
   const overrides = options.overrides ?? {}
 
+  // Never throw. A raw TypeError here takes the whole React tree down to a white screen, and
+  // this function is called with whatever a speech model just produced.
+  const asrSafe = asrResult ?? { text: '', words: [], durationSec: 0 }
+
   const ref = tokenize(referenceText)
-  const hypText = asrResult.words?.length
-    ? asrResult.words.map((w) => w.word).join(' ')
-    : (asrResult.text ?? '')
+  // Strip Whisper's trailing-silence hallucinations before anything else sees them. A child who
+  // finishes reading and pauses reliably produces "Thank you. Thanks for watching!", and left in
+  // place it costs five insertions and drops a perfect read to frustration level.
+  const hypText = stripTrailingHallucination(
+    asrSafe.words?.length ? asrSafe.words.map((w) => w.word).join(' ') : (asrSafe.text ?? ''),
+  )
   const hyp = tokenize(hypText, { isHypothesis: true })
+
+  const validity = assessValidity(ref.runningWords, hyp.runningWords, asrSafe.durationSec)
 
   const ops = align(ref.normalized, hyp.normalized)
 
@@ -165,7 +202,10 @@ export function score(referenceText, asrResult, options = {}) {
       // Copula absence: "he is running" read as "he running". Documented AAE syntax, gated to
       // a closed set of function words -- never generic omission, or the tool would forgive
       // every dropped word in the passage.
-      if (options.dialectLayer !== false && isCopulaOmission(refWord)) {
+      // Copula suppression requires that the child actually said something. On a silent
+      // recording every word is an omission, and crediting "is"/"are" as dialect features
+      // handed a mute microphone four free correct words.
+      if (options.dialectLayer !== false && hyp.normalized.length > 0 && isCopulaOmission(refWord)) {
         bump(suppressionCounts, 'dialect')
         bump(dialectRuleCounts, 'copula-absence')
         tokens.push({
@@ -222,7 +262,98 @@ export function score(referenceText, asrResult, options = {}) {
     tokens,
     suppressionCounts,
     dialectRuleCounts,
-    metrics: computeMetrics(tokens, ref.normalized.length, asrResult.durationSec, options),
+    metrics: withVerdictGuard(
+      computeMetrics(tokens, ref.runningWords, asrSafe.durationSec, options),
+      validity,
+    ),
+    validity,
+  }
+}
+
+/**
+ * Is this recording scoreable at all?
+ *
+ * A failed microphone does not throw -- it returns silence, and silence scores as a complete
+ * read with every word omitted. Left alone the tool renders a confident, printable running
+ * record reporting 22% accuracy and a 10th-percentile band for a child who never spoke. In
+ * front of assessment-literate judges that is a worse failure than a crash, and in a classroom
+ * it is a false record attached to a real student.
+ *
+ * So the engine reports whether it believes the input, and the UI refuses to show a report when
+ * it does not.
+ */
+export function assessValidity(refWordCount, hypWordCount, durationSec) {
+  if (refWordCount === 0) {
+    return { ok: false, reason: 'no_passage', message: 'This passage has no text to score.' }
+  }
+
+  // Too MUCH transcript, which the original gate missed entirely.
+  //
+  // Whisper's two best-documented failure modes both produce excess output: a repetition loop
+  // on low-quality audio (the same word emitted dozens of times) and a trailing hallucination
+  // on silence ("Thank you. Thanks for watching!"). Child speech -- slow, quiet, full of long
+  // pauses -- is exactly the regime that triggers them. Left ungated, a perfect read plus a
+  // repetition loop scored 0% accuracy at frustration level, and reported it confidently.
+  //
+  // A reader whose recorder was left running also lands here, which is correct: a passage read
+  // twice is not a scoreable one-minute sample.
+  if (refWordCount > 0 && hypWordCount > refWordCount * 1.5) {
+    return {
+      ok: false,
+      reason: 'transcript_too_long',
+      message: 'The transcript is much longer than the passage. The recording may have kept running, or the audio was too quiet to transcribe cleanly. Re-record.',
+    }
+  }
+
+  if (!Number.isFinite(durationSec) || durationSec < 2) {
+    return { ok: false, reason: 'too_short', message: 'That recording was too short to score. Try again.' }
+  }
+  if (hypWordCount === 0) {
+    return { ok: false, reason: 'no_speech', message: 'No speech was detected. Check the microphone and try again.' }
+  }
+  // Under a fifth of the passage usually means the mic cut out or the reader stopped, not a
+  // reader who omitted eighty words. Scoreable, but not silently.
+  if (refWordCount > 0 && hypWordCount < refWordCount * 0.2) {
+    return {
+      ok: false,
+      reason: 'mostly_silent',
+      message: 'Only a few words were heard. Check the microphone, or re-record.',
+    }
+  }
+  // A rate no human produces. 100 words in 2.0s is 3000 WCPM; the duration floor caps the
+  // absurdity without making it plausible. The published norms top out around 200.
+  const rate = durationSec > 0 ? (refWordCount / durationSec) * 60 : 0
+  if (rate > 400) {
+    return {
+      ok: false,
+      reason: 'implausible_rate',
+      message: 'That timing is too fast to be a real read. Check the recording and try again.',
+    }
+  }
+
+  return { ok: true, reason: null, message: null }
+}
+
+/**
+ * Strip the judgements from an unscoreable read.
+ *
+ * The raw counts stay, because they are useful for diagnosing what went wrong. The three fields
+ * that constitute a verdict about a child -- accuracy, instructional level, percentile -- are
+ * nulled, so that no caller can render a confident assessment from a recording we have already
+ * decided we do not believe. A UI that forgets to check `validity` now shows blanks rather than
+ * "frustration level, 10th percentile" for a child whose microphone was muted.
+ */
+function withVerdictGuard(metrics, validity) {
+  if (validity.ok) return { ...metrics, scoreable: true }
+  return {
+    ...metrics,
+    scoreable: false,
+    accuracyPct: null,
+    wcpm: null,
+    level: null,
+    percentile: null,
+    selfCorrectionRate: null,
+    selfCorrectionDisplay: '—',
   }
 }
 
@@ -263,8 +394,27 @@ export function computeMetrics(tokens, totalWords, durationSec, options = {}) {
   const selfCorrections = counts.self_correction
   const wordsCorrect = Math.max(0, totalWords - errors)
 
+  // WCPM and accuracy do NOT use the same error count, and conflating them is a real
+  // methodological error rather than a rounding difference.
+  //
+  // Clay's running record counts insertions as errors, so they belong in `accuracyPct`.
+  // Hasbrouck & Tindal's ORF procedure does not: their errors are "words read or pronounced
+  // incorrectly, omitted, read out of order, or words pronounced for the student by the
+  // examiner after a 3-second pause" (TR#1702, p.1). An inserted word is none of those -- it is
+  // not a passage word at all. Subtracting it from words-correct-per-minute would make our
+  // WCPM incomparable with the very norm table we then look the child up in.
+  const rateErrors = counts.substitution + counts.omission
+  const wordsCorrectForRate = Math.max(0, totalWords - rateErrors)
+
   const accuracyPct = totalWords > 0 ? (wordsCorrect / totalWords) * 100 : 0
-  const wcpm = durationSec > 0 ? (wordsCorrect / durationSec) * 60 : 0
+
+  // Floor the denominator. `durationSec` is a performance.now() delta around MediaRecorder
+  // start/stop with nothing stopping it being tiny -- a double-tapped stop button produced
+  // "600000 WCPM, 90th percentile", which is the kind of number that gets laughed at on stage.
+  // Two seconds is below any real read and keeps the arithmetic in the realm of the possible.
+  const MIN_DURATION_SEC = 2
+  const safeDuration = Number.isFinite(durationSec) && durationSec > 0 ? Math.max(durationSec, MIN_DURATION_SEC) : 0
+  const wcpm = safeDuration > 0 ? (wordsCorrectForRate / safeDuration) * 60 : 0
 
   // Standard formula is (E + SC) / SC, reported as the ratio 1:N. It divides by zero when
   // there are no self-corrections -- which is the common case, not an edge case. null means

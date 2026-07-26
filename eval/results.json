@@ -100,7 +100,7 @@
       },
       "cleanFalsePositives": 2,
       "cleanAccuracy": 97.6,
-      "wcpmReported": 193,
+      "wcpmReported": 196,
       "wcpmTrue": 198,
       "transcriptClean": "The old wood and bridge crossed the river just below the mill, for many years the farmers used it to bring their carts to market. One autumn the rain fell for nine days without stopping and the river rose higher than anyone could remember, the bridge groaned but it held, when the water finally went down the whole town gathered on the bank to see whether it had survived, it had, and the mayor declared that the bridge would stand for another hundred years."
     },
@@ -296,11 +296,10 @@
     }
   },
   "suppressionTotals": {
-    "phonetic": 4,
-    "fuzzy": 2,
+    "phonetic": 6,
     "homophone": 1
   },
   "dialectRuleTotals": {},
   "fpRate": 0.4750593824228029,
-  "meanWcpmError": 1
+  "meanWcpmError": 0.4
 }
