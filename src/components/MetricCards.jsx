@@ -61,10 +61,17 @@ const SEASONS = [
  * Every tile that expresses a judgement (level, percentile) carries the judgement in words.
  * None of them relies on colour to say whether a result is good.
  */
-export function MetricCards({ metrics, passage, season, onSeasonChange }) {
+export function MetricCards({ metrics, passage, student, season, onSeasonChange }) {
   const median = medianWcpm(passage.grade, season)
   const pct = percentileCopy(metrics.percentile, metrics.wcpm, passage.grade, season)
   const level = LEVEL_COPY[metrics.level]
+
+  // Out-of-level reading. The percentile is computed from the PASSAGE's grade, so when the two
+  // grades differ the band is not a statement about this child's year group -- and a teacher
+  // glancing at "50th percentile" would reasonably assume it was. Shown here, next to the
+  // number, rather than back on the roster screen where there is nothing yet to interpret.
+  const outOfLevel = student && student.grade !== passage.grade
+  const beyondNorms = student && student.grade > 6
 
   return (
     <div className="flex flex-col gap-4">
@@ -102,6 +109,13 @@ export function MetricCards({ metrics, passage, season, onSeasonChange }) {
         />
         <Tile label="Instructional level" value={level.label} detail={level.detail} valueSize="text-2xl" />
         <Tile label="Percentile band" value={pct.value} detail={pct.detail} valueSize="text-2xl" />
+        {outOfLevel && (
+          <p className="col-span-2 text-xs leading-relaxed" style={{ color: 'var(--ra-muted)' }}>
+            Compared against <strong>grade {passage.grade}</strong> — the passage — not{' '}
+            {student.grade === 0 ? 'kindergarten' : `grade ${student.grade}`}, this student&rsquo;s own.
+            {beyondNorms && ' Published fluency norms stop at grade 6, so no comparison to their year group exists.'}
+          </p>
+        )}
       </div>
 
       <div className="card">

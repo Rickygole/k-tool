@@ -58,31 +58,96 @@ export function gradeLabel(grade) {
 }
 
 export const STUDENTS = [
-  // Elementary
-  { id: 's1', name: 'Amara Okonjo', grade: 3, initials: 'AO' },
-  { id: 's2', name: 'Ben Castellanos', grade: 2, initials: 'BC' },
-  { id: 's3', name: 'Priya Raghunathan', grade: 4, initials: 'PR' },
-  { id: 's4', name: 'Dorian Wells', grade: 3, initials: 'DW' },
-  { id: 's5', name: 'Mei-Lin Chow', grade: 2, initials: 'MC' },
-  { id: 's6', name: 'Elias Braun', grade: 0, initials: 'EB' },
-  { id: 's7', name: 'Noor Haddad', grade: 1, initials: 'NH' },
-  { id: 's8', name: 'Tomas Ferreira', grade: 1, initials: 'TF' },
-  { id: 's9', name: 'Grace Mwangi', grade: 4, initials: 'GM' },
-  { id: 's10', name: 'Oliver Nakamura', grade: 5, initials: 'ON' },
-  { id: 's11', name: 'Zara Iqbal', grade: 5, initials: 'ZI' },
+  // Elementary · Kindergarten
+  { id: 's1', name: 'Elias Braun', grade: 0, initials: 'EB' },
+  { id: 's2', name: 'Maya Okafor', grade: 0, initials: 'MO' },
+  { id: 's3', name: 'Theo Lindqvist', grade: 0, initials: 'TL' },
+  { id: 's4', name: 'Amina Sesay', grade: 0, initials: 'AS' },
+  { id: 's5', name: 'Jonah Pierce', grade: 0, initials: 'JP' },
 
-  // Middle
-  { id: 's12', name: 'Andre Whitfield', grade: 6, initials: 'AW' },
-  { id: 's13', name: 'Lucia Moreno', grade: 6, initials: 'LM' },
-  { id: 's14', name: 'Kofi Boateng', grade: 7, initials: 'KB' },
-  { id: 's15', name: 'Hannah Delgado', grade: 7, initials: 'HD' },
-  { id: 's16', name: 'Ravi Sundaram', grade: 8, initials: 'RS' },
+  // Elementary · Grade 1
+  { id: 's6', name: 'Noor Haddad', grade: 1, initials: 'NH' },
+  { id: 's7', name: 'Tomas Ferreira', grade: 1, initials: 'TF' },
+  { id: 's8', name: 'Iris Kaplan', grade: 1, initials: 'IK' },
+  { id: 's9', name: 'Malik Osei', grade: 1, initials: 'MO' },
+  { id: 's10', name: 'Rosa Delgado', grade: 1, initials: 'RD' },
 
-  // High
-  { id: 's17', name: 'Jasmine Carter', grade: 9, initials: 'JC' },
-  { id: 's18', name: 'Mateo Rivas', grade: 10, initials: 'MR' },
-  { id: 's19', name: 'Aisha Bello', grade: 11, initials: 'AB' },
-  { id: 's20', name: 'Daniel Kowalski', grade: 12, initials: 'DK' },
+  // Elementary · Grade 2
+  { id: 's11', name: 'Ben Castellanos', grade: 2, initials: 'BC' },
+  { id: 's12', name: 'Mei-Lin Chow', grade: 2, initials: 'MC' },
+  { id: 's13', name: 'Aaliyah Freeman', grade: 2, initials: 'AF' },
+  { id: 's14', name: 'Nikhil Rao', grade: 2, initials: 'NR' },
+  { id: 's15', name: 'Clara Bergstrom', grade: 2, initials: 'CB' },
+
+  // Elementary · Grade 3
+  { id: 's16', name: 'Amara Okonjo', grade: 3, initials: 'AO' },
+  { id: 's17', name: 'Dorian Wells', grade: 3, initials: 'DW' },
+  { id: 's18', name: 'Yusuf Karim', grade: 3, initials: 'YK' },
+  { id: 's19', name: 'Lena Petrov', grade: 3, initials: 'LP' },
+  { id: 's20', name: 'Caleb Ruiz', grade: 3, initials: 'CR' },
+
+  // Elementary · Grade 4
+  { id: 's21', name: 'Priya Raghunathan', grade: 4, initials: 'PR' },
+  { id: 's22', name: 'Grace Mwangi', grade: 4, initials: 'GM' },
+  { id: 's23', name: 'Owen Kavanagh', grade: 4, initials: 'OK' },
+  { id: 's24', name: 'Sofia Marchetti', grade: 4, initials: 'SM' },
+  { id: 's25', name: 'Andre Duval', grade: 4, initials: 'AD' },
+
+  // Elementary · Grade 5
+  { id: 's26', name: 'Oliver Nakamura', grade: 5, initials: 'ON' },
+  { id: 's27', name: 'Zara Iqbal', grade: 5, initials: 'ZI' },
+  { id: 's28', name: 'Marcus Bell', grade: 5, initials: 'MB' },
+  { id: 's29', name: 'Hana Yoshida', grade: 5, initials: 'HY' },
+  { id: 's30', name: 'Diego Salazar', grade: 5, initials: 'DS' },
+
+  // Middle · Grade 6
+  { id: 's31', name: 'Andre Whitfield', grade: 6, initials: 'AW' },
+  { id: 's32', name: 'Lucia Moreno', grade: 6, initials: 'LM' },
+  { id: 's33', name: 'Simone Achebe', grade: 6, initials: 'SA' },
+  { id: 's34', name: 'Ethan Nordstrom', grade: 6, initials: 'EN' },
+  { id: 's35', name: 'Farah Nasser', grade: 6, initials: 'FN' },
+
+  // Middle · Grade 7
+  { id: 's36', name: 'Kofi Boateng', grade: 7, initials: 'KB' },
+  { id: 's37', name: 'Hannah Delgado', grade: 7, initials: 'HD' },
+  { id: 's38', name: 'Julian Reyes', grade: 7, initials: 'JR' },
+  { id: 's39', name: 'Nadia Petrosyan', grade: 7, initials: 'NP' },
+  { id: 's40', name: 'Isaac Lindgren', grade: 7, initials: 'IL' },
+
+  // Middle · Grade 8
+  { id: 's41', name: 'Ravi Sundaram', grade: 8, initials: 'RS' },
+  { id: 's42', name: 'Imani Clarke', grade: 8, initials: 'IC' },
+  { id: 's43', name: 'Victor Almeida', grade: 8, initials: 'VA' },
+  { id: 's44', name: 'Chloe Bergman', grade: 8, initials: 'CB' },
+  { id: 's45', name: 'Omar Fadel', grade: 8, initials: 'OF' },
+
+  // High · Grade 9
+  { id: 's46', name: 'Jasmine Carter', grade: 9, initials: 'JC' },
+  { id: 's47', name: 'Leo Vasquez', grade: 9, initials: 'LV' },
+  { id: 's48', name: 'Anika Deshmukh', grade: 9, initials: 'AD' },
+  { id: 's49', name: 'Connor Blaine', grade: 9, initials: 'CB' },
+  { id: 's50', name: 'Yara Mansour', grade: 9, initials: 'YM' },
+
+  // High · Grade 10
+  { id: 's51', name: 'Mateo Rivas', grade: 10, initials: 'MR' },
+  { id: 's52', name: 'Naomi Kirby', grade: 10, initials: 'NK' },
+  { id: 's53', name: 'Sebastian Hoang', grade: 10, initials: 'SH' },
+  { id: 's54', name: 'Talia Rosenberg', grade: 10, initials: 'TR' },
+  { id: 's55', name: 'Darius Cole', grade: 10, initials: 'DC' },
+
+  // High · Grade 11
+  { id: 's56', name: 'Aisha Bello', grade: 11, initials: 'AB' },
+  { id: 's57', name: 'Nathan Okamoto', grade: 11, initials: 'NO' },
+  { id: 's58', name: 'Elena Vukovic', grade: 11, initials: 'EV' },
+  { id: 's59', name: 'Jamal Prescott', grade: 11, initials: 'JP' },
+  { id: 's60', name: 'Ruby Sinclair', grade: 11, initials: 'RS' },
+
+  // High · Grade 12
+  { id: 's61', name: 'Daniel Kowalski', grade: 12, initials: 'DK' },
+  { id: 's62', name: 'Simone Laurent', grade: 12, initials: 'SL' },
+  { id: 's63', name: 'Tobias Amari', grade: 12, initials: 'TA' },
+  { id: 's64', name: 'Priya Venkatesan', grade: 12, initials: 'PV' },
+  { id: 's65', name: 'Ezra Whitfield', grade: 12, initials: 'EW' },
 ]
 
 /** The level a grade belongs to, or null if it is outside K-12. */

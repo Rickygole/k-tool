@@ -98,7 +98,7 @@ export function Results({
           </details>
         </div>
 
-        <MetricCards metrics={metrics} passage={passage} season={season} onSeasonChange={onSeasonChange} />
+        <MetricCards metrics={metrics} passage={passage} student={student} season={season} onSeasonChange={onSeasonChange} />
       </div>
 
       <div className="mt-6 flex flex-col gap-6">

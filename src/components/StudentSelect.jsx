@@ -3,7 +3,6 @@ import {
   SCHOOL_LEVELS,
   gradeCounts,
   gradeLabel,
-  levelForGrade,
   studentsInGrade,
 } from '../data/students.js'
 
@@ -17,11 +16,11 @@ import {
  * and "which grade am I looking at" is a detail of choosing a student, not a stage of the
  * assessment. The breadcrumb provides back-navigation without the router ever knowing.
  *
- * The norms notice on middle and high school is the substantive part of this screen. Published
- * ORF norms cover grades 1-6 only, so an older student can still be assessed -- accuracy and
- * WCPM remain real measurements, and assessing an older struggling reader against a lower-grade
- * passage is ordinary practice -- but no percentile band exists for them. Saying so at the point
- * of selection is better than a teacher discovering an empty field on the report afterwards.
+ * There is deliberately NO norms warning on this screen. An earlier version put one here, and it
+ * was wrong twice over: it fired before a passage had even been chosen, so there was nothing the
+ * teacher could act on, and it looked like an alarm about a problem that did not exist yet. The
+ * caveat belongs beside the percentile on the results screen, where somebody is actually reading
+ * the number -- see the out-of-level note in MetricCards.
  */
 export function StudentSelect({ selectedId, onSelect }) {
   const [levelKey, setLevelKey] = useState(null)
@@ -101,14 +100,6 @@ function LevelCards({ onPick }) {
             <span className="text-sm" style={{ color: 'var(--ra-muted)' }}>
               {level.blurb}
             </span>
-            {!level.hasOrfNorms && (
-              <span
-                className="mt-2 rounded-full px-2 py-0.5 text-xs"
-                style={{ background: 'var(--ra-unsure-bg)', color: 'var(--ra-unsure)' }}
-              >
-                Percentile reflects passage grade
-              </span>
-            )}
           </button>
         </li>
       ))}
@@ -121,8 +112,6 @@ function GradeCards({ level, onPick }) {
 
   return (
     <>
-      {!level.hasOrfNorms && <NormsNotice level={level} />}
-
       <ul className="grid grid-cols-4 gap-4">
         {counts.map(({ grade, count }) => (
           <li key={grade}>
@@ -148,12 +137,9 @@ function GradeCards({ level, onPick }) {
 
 function StudentCards({ grade, selectedId, onSelect }) {
   const students = studentsInGrade(grade)
-  const level = levelForGrade(grade)
 
   return (
     <>
-      {level && !level.hasOrfNorms && <NormsNotice level={level} />}
-
       <ul className="grid grid-cols-3 gap-4">
         {students.map((student) => (
           <li key={student.id}>
@@ -184,25 +170,3 @@ function StudentCards({ grade, selectedId, onSelect }) {
   )
 }
 
-/**
- * Told at the point of selection, not discovered on the report.
- *
- * This is a limitation of the published research, not of this tool, and the distinction matters:
- * we are not declining to compute something we could compute.
- */
-function NormsNotice({ level }) {
-  return (
-    <p
-      className="mb-5 rounded-xl px-4 py-3 text-sm"
-      style={{ background: 'var(--ra-unsure-bg)', color: 'var(--ra-unsure)' }}
-    >
-      <strong>{level.label}:</strong> everything works — accuracy, words correct per minute, and the
-      full miscue analysis. Read the percentile carefully though: it compares this reader against the
-      norm for the <strong>passage&rsquo;s</strong> grade, not their own. Published oral reading fluency
-      norms stop at grade 6, so there is no way to say how a {level.label.toLowerCase()} student compares
-      to their own grade peers. Scoring an older struggling reader against a lower-grade passage is
-      ordinary practice; just read the band as &ldquo;reads grade-3 text at a typical grade-3 rate,&rdquo;
-      not as a statement about their year group.
-    </p>
-  )
-}
