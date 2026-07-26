@@ -249,6 +249,9 @@ export function suppressedRows(tokens) {
     .filter(({ token }) => token.suppressedBy != null)
     .map(({ index, token }) => ({
       index,
+      // The teacher pushes back by reference index, the same key `overrides` uses.
+      refIndex: token.refIndex,
+      reinstated: token.reinstated === true,
       expected: token.refWord ?? '—',
       heard: token.hypWord ?? '—',
       reason: SUPPRESSION_REASON[token.suppressedBy] ?? token.suppressedBy,

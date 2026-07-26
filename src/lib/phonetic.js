@@ -7,7 +7,8 @@
  * false suppressions, the fix is to tighten the gate below, not to swap the algorithm.
  */
 
-import { bothCommon } from './lexicon.js'
+import { bothCommon, sharesLemma } from './lexicon.js'
+import { similarity } from './align.js'
 
 const CODES = {
   b: '1', f: '1', p: '1', v: '1',
@@ -64,7 +65,25 @@ export function phoneticMatch(a, b) {
   // first-grade decoding errors a running record exists to catch.
   if (bothCommon(a, b)) return false
 
+  // A word and its own inflection are never a phonetic coincidence. Soundex ignores most
+  // suffixes, so `dogs`/`dog`, `lived`/`left` and `showed`/`said` were all passing -- erasing
+  // plural, tense and comprehension-breaking substitutions from real reports. `bothCommon`
+  // could not catch these: no word list contains every inflected form, and on this project's
+  // own eval passages 100% of inflected forms were missing from it.
+  if (sharesLemma(a, b)) return false
+
   if (Math.abs(a.length - b.length) > 2) return false
-  if (a[0] !== b[0]) return false
+
+  // Soundex alone is far too coarse to carry this filter. It ignores vowels entirely, so
+  // `showed`/`said`, `lived`/`left`, `garden`/`gordon` and `farmers`/`framers` all share a key
+  // -- and the last two are PLANTED SUBSTITUTIONS in our own eval, being forgiven as phonetic
+  // near-misses. The filter was lowering our substitution recall, not raising it.
+  //
+  // Two extra conditions do the work Soundex cannot. The first two letters must agree, which is
+  // where a real ASR spelling variant preserves the onset and a genuine substitution usually
+  // does not; and the words must actually look alike.
+  if (a.slice(0, 2) !== b.slice(0, 2)) return false
+  if (similarity(a, b) < 0.7) return false
+
   return soundex(a) === soundex(b)
 }

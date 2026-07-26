@@ -21,7 +21,7 @@ const ORDER = ['dialect', 'homophone', 'fuzzy', 'phonetic', 'contraction']
  * reader said "aks". Many of these rules will therefore show a count of zero, and that zero is
  * reported rather than hidden.
  */
-export function SuppressionPanel({ rows, suppressionCounts, dialectRuleCounts }) {
+export function SuppressionPanel({ rows, suppressionCounts, dialectRuleCounts, onReinstate }) {
   const total = rows.length
 
   return (
@@ -37,8 +37,10 @@ export function SuppressionPanel({ rows, suppressionCounts, dialectRuleCounts })
 
       <p className="mt-2 max-w-2xl text-sm leading-relaxed" style={{ color: 'var(--ra-muted)' }}>
         These words did not match the passage exactly, and we declined to score them as errors. Each
-        one is listed with its reason. Anything here can still be marked as an error by scoring it
-        yourself — the tool is a stopwatch with opinions, not the assessor.
+        one is listed with its reason, and any of them can be counted as an error with one click.
+        The scoring runs in both directions on purpose: if the only control a teacher had were the
+        power to forgive, every adjustment this tool offers would push the score upward. The
+        teacher is the assessor; we are the stopwatch.
       </p>
 
       {total === 0 ? (
@@ -67,6 +69,9 @@ export function SuppressionPanel({ rows, suppressionCounts, dialectRuleCounts })
                 <th scope="col" className="pb-2 font-medium">In the passage</th>
                 <th scope="col" className="pb-2 font-medium">Heard</th>
                 <th scope="col" className="pb-2 font-medium">Why it was not counted</th>
+                <th scope="col" className="pb-2 font-medium">
+                  <span className="sr-only">Count this word as an error</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -82,6 +87,19 @@ export function SuppressionPanel({ rows, suppressionCounts, dialectRuleCounts })
                       <span className="ml-1" style={{ color: 'var(--ra-unsure)' }}>
                         ({row.rules.join(', ')})
                       </span>
+                    )}
+                  </td>
+                  <td className="py-2 pl-2 text-right">
+                    {row.refIndex != null && onReinstate && (
+                      <button
+                        type="button"
+                        onClick={() => onReinstate(row, !row.reinstated)}
+                        aria-pressed={row.reinstated}
+                        className="btn-quiet whitespace-nowrap"
+                        style={row.reinstated ? { color: 'var(--ra-miscue)', fontWeight: 600 } : undefined}
+                      >
+                        {row.reinstated ? '✓ Counted as an error' : 'Count as an error'}
+                      </button>
                     )}
                   </td>
                 </tr>

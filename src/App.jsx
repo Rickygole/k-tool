@@ -9,6 +9,7 @@ import { PassageSelect } from './components/PassageSelect.jsx'
 import { ReadScreen } from './components/ReadScreen.jsx'
 import { Results } from './components/Results.jsx'
 import { TeacherReport } from './components/TeacherReport.jsx'
+import { StudentResult } from './components/StudentResult.jsx'
 import { UnscoreableRead } from './components/UnscoreableRead.jsx'
 
 /**
@@ -49,6 +50,13 @@ export default function App() {
   // insertions have no reference index -- see applyInsertionOverrides below.
   const [overrides, setOverrides] = useState({})
   const [insertionOverrides, setInsertionOverrides] = useState(() => new Set())
+  // The other direction: words the engine forgave and the teacher wants counted. Keeping the
+  // two maps separate means a word can never be simultaneously overridden and reinstated.
+  const [reinstated, setReinstated] = useState({})
+  // 'teacher' | 'student'. An AUDIENCE, not a step: the student view is a second rendering of
+  // the same record, so it must not be able to drift from it or add a state the demo can get
+  // stranded in. The step machine stays at five.
+  const [audience, setAudience] = useState('teacher')
 
   // Start the model download the moment the app opens, not when the record button is pressed.
   // By the time a teacher has picked a student and a passage it is usually already cached.
@@ -89,8 +97,9 @@ export default function App() {
       grade: passage.grade,
       season,
       overrides,
+      reinstated,
     })
-  }, [passage, read, season, overrides])
+  }, [passage, read, season, overrides, reinstated])
 
   /**
    * Insertions cannot be overridden through score(). `options.overrides` is keyed by reference
@@ -137,24 +146,39 @@ export default function App() {
   const handleComplete = useCallback(({ asr, source }) => {
     setOverrides({})
     setInsertionOverrides(new Set())
+    setReinstated({})
+    setAudience('teacher')
     setRead({ asr, source, at: Date.now() })
     setDemoToken(null)
     setStep('results')
   }, [])
 
+  const handleReinstate = useCallback((row, value) => {
+    if (row.refIndex == null) return
+    setReinstated((prev) => {
+      const next = { ...prev }
+      if (value) next[row.refIndex] = true
+      else delete next[row.refIndex]
+      return next
+    })
+  }, [])
+
   const handleNavigate = useCallback((target) => {
     setStep(target)
+    setAudience('teacher')
     setDemoToken(null)
   }, [])
 
   const restart = useCallback(() => {
     setStep('student')
+    setAudience('teacher')
     setStudent(null)
     setPassage(null)
     setRead(null)
     setDemoToken(null)
     setOverrides({})
     setInsertionOverrides(new Set())
+    setReinstated({})
   }, [])
 
   // The header's step trail only knows about the four assessment steps; the printable report
@@ -222,7 +246,16 @@ export default function App() {
           />
         )}
 
-        {showResults && !unscoreable && (
+        {showResults && !unscoreable && audience === 'student' && (
+          <StudentResult
+            student={student}
+            tokens={tokens}
+            metrics={metrics}
+            onBack={() => setAudience('teacher')}
+          />
+        )}
+
+        {showResults && !unscoreable && audience === 'teacher' && (
           <Results
             student={student}
             passage={passage}
@@ -234,6 +267,8 @@ export default function App() {
             season={season}
             onSeasonChange={setSeason}
             onOverride={handleOverride}
+            onReinstate={handleReinstate}
+            onShowStudent={() => setAudience('student')}
             onPrint={() => setStep('report')}
             onReadAgain={() => setStep('read')}
             onRestart={restart}

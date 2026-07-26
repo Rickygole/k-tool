@@ -9,6 +9,7 @@ import { score } from './score.js'
 import { align } from './align.js'
 import { percentileBand, medianWcpm } from './norms.js'
 import { soundex } from './phonetic.js'
+import { sharesLemma } from './lexicon.js'
 
 const PASSAGE = 'The little fox lived at the edge of the woods'
 
@@ -359,5 +360,43 @@ describe('hardening — findings from the review gate', () => {
 
     const oneWord = score('fox', asr('fox'))
     expect(oneWord.metrics.accuracyPct).toBe(100)
+  })
+})
+
+describe('the phonetic filter no longer erases real substitutions', () => {
+  // Soundex ignores vowels and most suffixes, so it was bridging pairs that are plainly
+  // different words. Two of these are PLANTED substitutions in our own eval fixtures -- the
+  // filter was lowering our substitution recall while appearing to help.
+  const mustFlag = [
+    ['showed', 'said', 'comprehension-breaking substitution'],
+    ['lived', 'left', 'different word entirely'],
+    ['every', 'ever', 'dropped syllable'],
+    ['farmers', 'framers', 'planted in eval/fixtures.js'],
+    ['garden', 'gordon', 'planted in eval/fixtures.js'],
+    ['dogs', 'dog', 'dropped plural'],
+    ['books', 'book', 'dropped plural'],
+    ['stopped', 'stop', 'dropped tense'],
+    ['hoped', 'hope', 'dropped tense'],
+    ['carried', 'carry', 'dropped tense'],
+  ]
+
+  it.each(mustFlag)('"%s" read as "%s" is an error (%s)', (ref, hyp) => {
+    expect(score(`the ${ref} came`, asr(`the ${hyp} came`)).metrics.errors).toBe(1)
+  })
+
+  it('an inflection is never a phonetic coincidence', () => {
+    expect(sharesLemma('dog', 'dogs')).toBe(true)
+    expect(sharesLemma('live', 'lived')).toBe(true)
+    expect(sharesLemma('stop', 'stopped')).toBe(true)
+    expect(sharesLemma('carry', 'carried')).toBe(true)
+    expect(sharesLemma('run', 'running')).toBe(true)
+    // Unrelated words that merely share letters must not be swept up.
+    expect(sharesLemma('cat', 'dog')).toBe(false)
+    expect(sharesLemma('showed', 'said')).toBe(false)
+  })
+
+  it('still forgives a genuine ASR spelling variant', () => {
+    // The filter keeps its job: same onset, same shape, same sound.
+    expect(score('the restaurant opened', asr('the restaurent opened')).metrics.errors).toBe(0)
   })
 })

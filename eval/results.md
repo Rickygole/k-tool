@@ -2,7 +2,7 @@
 
 | Miscue type | Precision | Recall | F1 | TP | FP | FN |
 |---|---|---|---|---|---|---|
-| substitution | 80.0% | 80.0% | 80.0% | 16 | 4 | 4 |
+| substitution | 81.8% | 90.0% | 85.7% | 18 | 4 | 2 |
 | omission | 93.8% | 100.0% | 96.8% | 15 | 1 | 0 |
 | insertion | 83.3% | 100.0% | 90.9% | 10 | 2 | 0 |
 | self-correction | 100.0% | 40.0% | 57.1% | 2 | 0 | 3 |
@@ -26,7 +26,7 @@ layer is doing nothing on this data and we say so rather than implying otherwise
 | dialect | 0 |
 | homophone | 1 |
 | fuzzy | 0 |
-| phonetic | 6 |
+| phonetic | 4 |
 | contraction | 0 |
 
 ## Per-passage

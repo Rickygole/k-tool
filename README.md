@@ -92,13 +92,39 @@ src/
 
 Plain JavaScript and JSX. Tailwind for styling, and no other UI dependency of any kind.
 
-## Norms
+## Norms and sources
 
-Hasbrouck, J., & Tindal, G. (2017). *An update to compiled ORF norms* (Technical Report No. 1702).
-Behavioral Research and Teaching, University of Oregon.
+Every figure in `src/lib/norms.js` was checked digit-by-digit against the primary source, not
+copied from a secondary table. Two of the six commonly-quoted spring medians circulate in a
+1996-era form; grade 4 is 133 and grade 6 is 146 in the 2017 revision.
+
+**Fluency measurement**
+- Hasbrouck, J., & Tindal, G. (2017). *An update to compiled ORF norms* (Technical Report
+  No. 1702). Behavioral Research and Teaching, University of Oregon. — the norm table.
+- Fuchs, L. S., Fuchs, D., Hosp, M. K., & Jenkins, J. R. (2001). Oral reading fluency as an
+  indicator of reading competence. *Scientific Studies of Reading*, 5(3), 239–256. — why words
+  correct per minute is a defensible proxy for reading competence at all.
+
+**Why the suppression layer exists** — these sit behind the amber column and the equity claim:
+- Labov, W., & Baker, B. (2010). What is a reading error? *Applied Psycholinguistics*, 31(4).
+- Charity, A. H., Scarborough, H. S., & Griffin, D. M. (2004). Familiarity with school English
+  in African American children. *Child Development*, 75(5).
+- Goodman, K. S., & Buck, C. (1973). Dialect barriers to reading comprehension revisited.
+  *The Reading Teacher*, 27(1).
+- Koenecke, A., et al. (2020). Racial disparities in automated speech recognition. *PNAS*,
+  117(14). — roughly double the word error rate for Black speakers across all five major
+  commercial recognisers. This is the measured bias the tool is built against.
 
 Percentiles are reported as **bands**, not point estimates. A five-row table cannot support a claim
 like "37th percentile", and pretending otherwise is the kind of false precision that makes an
-assessment tool untrustworthy.
+assessment tool untrustworthy. A score below the published 10th percentile reports `below_10`
+rather than "10th percentile", and grades outside the published table report no band at all.
 
-Automated scoring is a screening aid. It does not replace teacher judgement.
+Automated scoring is a screening aid. It does not replace teacher judgement — and the teacher can
+push in **both** directions: any flagged word can be marked correct, and any word the engine
+suppressed can be counted as an error. That symmetry is deliberate. Every other degree of freedom
+in the system (four suppression filters) can only lower the error count, and a tool whose every
+adjustment pushed the score upward would not deserve to be believed.
+
+`EVAL.md` reports what the evaluation actually measured, including a headline feature that fired
+zero times and why.

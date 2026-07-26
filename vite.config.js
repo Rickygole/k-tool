@@ -13,8 +13,10 @@ export default defineConfig({
   plugins: [react()],
 
   // strictPort is load-bearing, not tidiness. transformers.js caches tens of MB of model weights
-  // in IndexedDB, and IndexedDB is scoped per origin. If Vite silently falls back to the next
-  // free port, the model re-downloads from scratch -- which on venue wifi is the difference
+  // via the Cache Storage API (`caches.open('transformers-cache')` -- NOT IndexedDB, which an
+  // earlier comment here claimed; a browser trace showed `indexedDB.databases()` empty both cold
+  // and warm). Cache Storage is origin-scoped all the same, so if Vite silently falls back to the
+  // next free port the model re-downloads from scratch -- which on venue wifi is the difference
   // between a demo and an apology.
   //
   // 5174 rather than the Vite default 5173 because the sibling `myvoice` project owns 5173. The

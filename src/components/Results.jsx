@@ -23,6 +23,8 @@ export function Results({
   season,
   onSeasonChange,
   onOverride,
+  onReinstate,
+  onShowStudent,
   onPrint,
   onReadAgain,
   onRestart,
@@ -48,6 +50,9 @@ export function Results({
           </button>
           <button type="button" className="btn-secondary" onClick={onReadAgain}>
             Read again
+          </button>
+          <button type="button" className="btn-secondary" onClick={onShowStudent}>
+            Show the student
           </button>
           <button type="button" className="btn-primary" onClick={onPrint}>
             Teacher report
@@ -99,6 +104,7 @@ export function Results({
       <div className="mt-6 flex flex-col gap-6">
         <MiscueList errors={errors} events={events} onOverride={onOverride} />
         <SuppressionPanel
+          onReinstate={onReinstate}
           rows={suppressed}
           suppressionCounts={suppressionCounts}
           dialectRuleCounts={dialectRuleCounts}

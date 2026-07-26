@@ -51,3 +51,41 @@ export const COMMON_WORDS = new Set(
 export function bothCommon(a, b) {
   return COMMON_WORDS.has(a) && COMMON_WORDS.has(b)
 }
+
+const INFLECTIONS = ['s', 'es', 'ed', 'd', 'ing', 'er', 'est', 'ly', 'y']
+
+/**
+ * Is one word the other plus a regular inflection?
+ *
+ * `bothCommon` has a hole it cannot close by growing: it is a membership test, and no word list
+ * contains every inflected form. Measured against this project's own eval passages, 100% of
+ * inflected forms and 59% of the passage vocabulary are absent from COMMON_WORDS -- so the
+ * Soundex filter was still forgiving real substitutions on the very text we score:
+ *
+ *     showed -> said     scored 100% correct
+ *     lived  -> left     scored 100% correct
+ *     dogs   -> dog      scored 100% correct
+ *
+ * `showed` read as `said` is a comprehension-breaking substitution, and a plural dropped is the
+ * morphology error the cluster-reduction guard in dialect.js exists to protect. Both were being
+ * erased from real teachers' reports.
+ *
+ * This closes it structurally rather than by enumeration: a word and its own inflection are
+ * never a phonetic coincidence, so no approximate filter may bridge them.
+ */
+export function sharesLemma(a, b) {
+  if (!a || !b || a === b) return false
+  const [shorter, longer] = a.length <= b.length ? [a, b] : [b, a]
+  if (!longer.startsWith(shorter.slice(0, Math.min(shorter.length, 3)))) return false
+
+  for (const suffix of INFLECTIONS) {
+    if (longer === shorter + suffix) return true
+    // "carry" -> "carried", "happy" -> "happier": y becomes i before the ending.
+    if (shorter.endsWith('y') && longer === `${shorter.slice(0, -1)}i${suffix}`) return true
+    // "hope" -> "hoping", "live" -> "lived": silent e is dropped.
+    if (shorter.endsWith('e') && longer === shorter.slice(0, -1) + suffix) return true
+    // "stop" -> "stopped", "run" -> "running": final consonant doubles.
+    if (longer === shorter + shorter.slice(-1) + suffix) return true
+  }
+  return false
+}

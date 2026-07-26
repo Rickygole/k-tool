@@ -111,7 +111,11 @@ function relaxMismatch(refWord, hypWord, options) {
  *
  * @param {string} referenceText  the passage as printed
  * @param {{text: string, words: {word: string, start?: number, end?: number}[], durationSec: number}} asrResult
- * @param {{grade?: number, season?: string, dialectLayer?: boolean, overrides?: Record<number, boolean>}} [options]
+ * @param {{grade?: number, season?: string, dialectLayer?: boolean,
+ *           overrides?: Record<number, boolean>,
+ *           reinstated?: Record<number, boolean>}} [options]
+ *        `overrides` marks a flagged word correct; `reinstated` marks a SUPPRESSED word as an
+ *        error. Both directions exist so the teacher is the assessor, not just a veto.
  * @returns {{tokens: ScoredToken[], metrics: Object, suppressionCounts: Record<string, number>}}
  */
 export function score(referenceText, asrResult, options = {}) {
@@ -162,9 +166,19 @@ export function score(referenceText, asrResult, options = {}) {
         ? op.refIndex
         : (nextRefIndexOf(ops, k) ?? (lastRefIndex(tokens) != null ? lastRefIndex(tokens) + 1 : 0))
 
+    // A teacher may also push the OTHER way -- reinstating a word the engine forgave.
+    //
+    // Every other degree of freedom in this system points at a higher score: four suppression
+    // filters that can only remove errors, and an override that could only remove errors. A
+    // reviewer's sharpest question was "why should I believe any number on this report?", and
+    // EVAL.md already conceded the gap: "there is no mechanism to mark a suppressed word as an
+    // error." This is that mechanism. The teacher is the assessor in both directions.
+    const reinstated = op.refIndex != null && options.reinstated?.[op.refIndex] === true
+
     const base = {
       refIndex: op.refIndex,
       anchorRefIndex,
+      reinstated,
       refWord: refDisplay,
       hypWord: hypDisplay,
       confidence: /** @type {'high'|'low'} */ ('high'),
@@ -187,7 +201,7 @@ export function score(referenceText, asrResult, options = {}) {
         continue
       }
 
-      const relaxed = relaxMismatch(refWord, hypWord, options)
+      const relaxed = reinstated ? null : relaxMismatch(refWord, hypWord, options)
       if (relaxed) {
         bump(suppressionCounts, relaxed.suppressedBy)
         for (const id of relaxed.dialectRules) bump(dialectRuleCounts, id)
@@ -205,7 +219,7 @@ export function score(referenceText, asrResult, options = {}) {
       // Copula suppression requires that the child actually said something. On a silent
       // recording every word is an omission, and crediting "is"/"are" as dialect features
       // handed a mute microphone four free correct words.
-      if (options.dialectLayer !== false && hyp.normalized.length > 0 && isCopulaOmission(refWord)) {
+      if (!reinstated && options.dialectLayer !== false && hyp.normalized.length > 0 && isCopulaOmission(refWord)) {
         bump(suppressionCounts, 'dialect')
         bump(dialectRuleCounts, 'copula-absence')
         tokens.push({
